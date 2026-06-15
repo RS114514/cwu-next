@@ -1,0 +1,2510 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>春晖的任意门 - 桌面客户端原型</title>
+  <style>
+    /* ─── 核心设计系统 (极简现代编辑感风格) ─────────────────────────────────── */
+    :root {
+      --bg:      #FBF9F4;   /* 温暖宣纸色 */
+      --surface: #FFFFFF;   /* 卡片白 */
+      --fg:      #191919;   /* 深焦糖黑 */
+      --muted:   #666561;   /* 暮色灰 */
+      --border:  #E5E2DD;   /* 温暖边框灰 */
+      --accent:  #C27052;   /* 琥珀陶土红 */
+
+      /* 状态色 */
+      --success: #4F7A5E;   /* 暮翠绿 */
+      --error:   #A84E39;   /* 砖红 */
+      --warning: #D1913C;   /* 麦田金 */
+      
+      --accent-soft: color-mix(in oklch, var(--accent) 10%, transparent);
+      --fg-soft:     color-mix(in oklch, var(--fg) 5%, transparent);
+
+      /* 全衬线字体美学 */
+      --font-display: Georgia, 'Lora', 'Playfair Display', '华文中宋', 'STZhongsong', '宋体-简', 'Songti SC', serif;
+      --font-body:    Georgia, 'Lora', 'Playfair Display', '华文中宋', 'STZhongsong', '宋体-简', 'Songti SC', serif;
+      --font-mono:    ui-monospace, 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+
+      /* 统一间距与圆角 */
+      --gap-xs: 8px;
+      --gap-sm: 12px;
+      --gap-md: 20px;
+      --gap-lg: 32px;
+      --gap-xl: 48px;
+      --radius: 8px;
+      --radius-lg: 12px;
+      
+      --shadow-sm: 0 1px 3px rgba(25, 25, 25, 0.05);
+      --shadow-md: 0 4px 12px rgba(25, 25, 25, 0.04);
+    }
+
+    /* ─── 深色模式 ─────────────────────────────────────────────────── */
+    :root.dark-theme {
+      --bg:      #191816;   /* 深墨色 */
+      --surface: #201E1B;   /* 暗灰卡片 */
+      --fg:      #E8E5DF;   /* 乳白字 */
+      --muted:   #9C9890;   /* 灰褐字 */
+      --border:  #383531;   /* 深褐线 */
+      --accent:  #E08E71;   /* 暖焦糖橙 */
+    }
+
+    /* ─── 基础样式重置 ──────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--font-body);
+      font-size: 14px;
+      line-height: 1.6;
+      letter-spacing: 0.02em; /* 优雅的字间距 */
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+      transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* 纸质纹理背景 */
+    body::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      opacity: 0.015;
+      pointer-events: none;
+      background-image: radial-gradient(var(--fg) 1px, transparent 0), radial-gradient(var(--fg) 1px, transparent 0);
+      background-size: 8px 8px;
+      background-position: 0 0, 4px 4px;
+      z-index: 100;
+    }
+    
+    button, input, textarea, select {
+      font: inherit;
+      color: inherit;
+      background: none;
+      border: none;
+      outline: none;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+    
+    /* ─── 桌面客户端模拟框架 (Windows 11) ──────────────────────────────── */
+    .client-frame {
+      width: 96vw;
+      height: 92vh;
+      max-width: 1400px;
+      max-height: 900px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* 客户端标题栏 */
+    .titlebar {
+      height: 38px;
+      background: color-mix(in oklch, var(--bg) 95%, var(--fg) 5%);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-inline: 16px;
+      user-select: none;
+      z-index: 10;
+    }
+    .titlebar .window-title {
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-display);
+    }
+    .titlebar .window-title .icon {
+      color: var(--accent);
+      font-weight: bold;
+    }
+    .titlebar .window-controls {
+      display: flex;
+      gap: 16px;
+    }
+    .titlebar .ctrl-btn {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--border);
+      transition: background 0.2s;
+      cursor: pointer;
+    }
+    .titlebar .ctrl-btn.close:hover { background: var(--error); }
+    .titlebar .ctrl-btn.minimize:hover { background: var(--warning); }
+    .titlebar .ctrl-btn.maximize:hover { background: var(--success); }
+
+    /* ─── 主体布局 ──────────────────────────────────────────────────── */
+    .client-body {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* 左侧边栏 */
+    .sidebar {
+      width: 240px;
+      background: color-mix(in oklch, var(--bg) 97%, var(--fg) 3%);
+      border-right: 1px solid var(--border);
+      padding: 24px 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .sidebar .logo-area {
+      margin-bottom: 24px;
+    }
+    .sidebar .brand-title {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--accent);
+      letter-spacing: -0.01em;
+    }
+    .sidebar .brand-subtitle {
+      font-size: 11px;
+      color: var(--muted);
+      font-family: var(--font-mono);
+      margin-top: 2px;
+    }
+    
+    .nav-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: auto;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: var(--radius);
+      color: var(--muted);
+      font-size: 13px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .nav-item:hover {
+      background: var(--fg-soft);
+      color: var(--fg);
+    }
+    .nav-item.active {
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 500;
+    }
+    .nav-item .icon {
+      font-size: 15px;
+      width: 20px;
+      text-align: center;
+    }
+
+    .sidebar-footer {
+      border-top: 1px solid var(--border);
+      padding-top: var(--gap-md);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .user-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px;
+      border-radius: var(--radius);
+      background: var(--fg-soft);
+      font-size: 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .user-badge:hover {
+      background: color-mix(in oklch, var(--fg) 10%, transparent);
+    }
+    .user-badge .avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: var(--surface);
+      display: grid;
+      place-items: center;
+      font-weight: bold;
+    }
+    .user-badge .info {
+      flex: 1;
+      overflow: hidden;
+    }
+    .user-badge .name {
+      font-weight: 500;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+    .user-badge .status {
+      font-size: 10px;
+      color: var(--muted);
+    }
+    
+    .sidebar-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--muted);
+      padding: 6px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .sidebar-btn:hover {
+      background: var(--fg-soft);
+      color: var(--fg);
+    }
+
+    /* 右侧主视口 */
+    .viewport {
+      flex: 1;
+      padding: 32px var(--gap-lg);
+      overflow-y: auto;
+      position: relative;
+      background: var(--bg);
+    }
+
+    /* ─── 页面/面板过渡动画 ─────────────────────────────────────────── */
+    .panel-view {
+      display: none;
+      animation: fadeIn 0.4s ease forwards;
+    }
+    .panel-view.active {
+      display: flex;
+      flex-direction: column;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── 标题和排版 ────────────────────────────────────────────────── */
+    header {
+      margin-bottom: var(--gap-md);
+    }
+    .page-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      margin-bottom: var(--gap-xs);
+    }
+    .page-title {
+      font-family: var(--font-display);
+      font-size: clamp(24px, 3.5vw, 32px);
+      font-weight: normal;
+      margin: 0;
+    }
+    
+    /* ─── 卡片样式 ──────────────────────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    }
+    .card.interactive:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--accent);
+    }
+    .card-title {
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 500;
+      margin-top: 0;
+      margin-bottom: 16px;
+      color: var(--fg);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* ─── 网格与布局 ────────────────────────────────────────────────── */
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .grid-2-1 { display: grid; grid-template-columns: 1.8fr 1.2fr; gap: 24px; }
+    .grid-1-2 { display: grid; grid-template-columns: 1.2fr 1.8fr; gap: 24px; }
+    @media (max-width: 960px) {
+      .grid-2, .grid-3, .grid-2-1, .grid-1-2 { grid-template-columns: 1fr; }
+    }
+    
+    /* ─── 按钮 ──────────────────────────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: var(--radius);
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      border: 1px solid transparent;
+      user-select: none;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: var(--surface);
+    }
+    .btn-primary:hover {
+      background: color-mix(in oklch, var(--accent) 85%, black);
+    }
+    .btn-secondary {
+      background: var(--surface);
+      border-color: var(--border);
+      color: var(--fg);
+    }
+    .btn-secondary:hover {
+      border-color: var(--fg);
+      background: var(--fg-soft);
+    }
+    .btn-sm {
+      padding: 4px 10px;
+      font-size: 12px;
+    }
+    
+    /* ─── 输入与表单 ────────────────────────────────────────────────── */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+    .form-group label {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .text-input, .select-input {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px 14px;
+      font-size: 13px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .text-input:focus, .select-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+
+    /* ─── 名言卡片 (Quotes) ─────────────────────────────────────────── */
+    .quote-box {
+      border-left: 2px solid var(--accent);
+      padding-left: 16px;
+      margin-block: var(--gap-xs);
+      position: relative;
+    }
+    .quote-text {
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-style: italic;
+      line-height: 1.5;
+      margin: 0 0 8px 0;
+    }
+    .quote-author {
+      font-size: 12px;
+      color: var(--muted);
+      text-align: right;
+      margin: 0;
+    }
+
+    /* ─── 链接与列表 ────────────────────────────────────────────── */
+    .portal-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px var(--gap-md);
+      border-bottom: 1px solid var(--border);
+      transition: background 0.2s;
+      cursor: pointer;
+    }
+    .portal-link:last-child {
+      border-bottom: none;
+    }
+    .portal-link:hover {
+      background: var(--fg-soft);
+    }
+    .portal-link .link-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .portal-link .link-icon {
+      font-size: 16px;
+      color: var(--accent);
+    }
+    .portal-link .link-title {
+      font-weight: 500;
+    }
+    .portal-link .link-desc {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .portal-link .arrow {
+      color: var(--border);
+      transition: transform 0.2s, color 0.2s;
+    }
+    .portal-link:hover .arrow {
+      color: var(--accent);
+      transform: translateX(4px);
+    }
+
+    /* ─── 选项卡 (Tabs) ─────────────────────────────────────────────── */
+    .tab-header {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 20px;
+      gap: 16px;
+    }
+    .tab-btn {
+      padding: 8px 8px 10px 8px;
+      font-size: 13px;
+      color: var(--muted);
+      position: relative;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .tab-btn:hover {
+      color: var(--fg);
+    }
+    .tab-btn.active {
+      color: var(--accent);
+      font-weight: 500;
+    }
+    .tab-btn.active::after {
+      content: "";
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--accent);
+    }
+
+    /* ─── 进度条 ───────────────────────────────────────────────────── */
+    .progress-bar-container {
+      width: 100%;
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 14px;
+      display: none;
+    }
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: var(--success);
+      transition: width 0.1s linear;
+    }
+    .status-msg {
+      font-size: 12px;
+      margin-top: 6px;
+      color: var(--muted);
+    }
+
+    /* ─── 工具箱 (Toolbox) ───────────────────────────────────────────── */
+    .lottery-grid {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+    .luck-card {
+      width: 160px;
+      height: 190px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      background-image: radial-gradient(var(--border) 1px, transparent 0);
+      background-size: 12px 12px;
+    }
+    .luck-card .card-label {
+      font-size: 11px;
+      color: var(--muted);
+      position: absolute;
+      top: 14px;
+    }
+    .luck-card .card-number {
+      font-family: var(--font-display);
+      font-size: 68px;
+      color: var(--accent);
+      font-weight: normal;
+      transition: opacity 0.1s ease;
+    }
+    .luck-card .card-decor {
+      font-size: 10px;
+      color: var(--border);
+      position: absolute;
+      bottom: 14px;
+    }
+
+    .card-stack-container {
+      position: relative;
+      height: 260px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .stack-card {
+      position: absolute;
+      width: 310px;
+      height: 200px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.02);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s, z-index 0.3s;
+      transform-origin: center bottom;
+    }
+    .stack-card .card-type {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+    }
+    .stack-card .card-content {
+      font-family: var(--font-display);
+      font-size: 15px;
+      line-height: 1.5;
+      text-align: center;
+      margin-block: auto;
+    }
+    .stack-card .card-tip {
+      font-size: 10px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    /* ─── 壁纸模块 ──────────────────────────────────────────────────── */
+    .loading-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding-block: var(--gap-lg);
+    }
+    .loading-spinner {
+      width: 32px;
+      height: 32px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 12px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .wallpaper-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 16px;
+    }
+    .wallpaper-item {
+      position: relative;
+      aspect-ratio: 16/10;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .wallpaper-item .ph-img {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: 16px;
+      color: #fff;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      transition: transform 0.3s ease;
+    }
+    .wallpaper-item:hover .ph-img {
+      transform: scale(1.05);
+    }
+    .wallpaper-item .item-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.6), transparent 60%);
+      display: flex;
+      align-items: flex-end;
+      padding: 12px;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .wallpaper-item:hover .item-overlay {
+      opacity: 1;
+    }
+    .wallpaper-item .item-title {
+      color: #fff;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    /* ─── 提示条 (Alerts) ───────────────────────────────────────────── */
+    .banner {
+      display: flex;
+      gap: 10px;
+      padding: 14px;
+      border-radius: var(--radius);
+      font-size: 12px;
+      line-height: 1.5;
+      margin-bottom: 18px;
+      background: var(--fg-soft);
+      border: 1px solid var(--border);
+    }
+    .banner-warning {
+      background: color-mix(in oklch, var(--warning) 8%, var(--bg));
+      border-color: color-mix(in oklch, var(--warning) 30%, var(--border));
+      color: color-mix(in oklch, var(--warning) 60%, var(--fg));
+    }
+    .banner-error {
+      background: color-mix(in oklch, var(--error) 6%, var(--bg));
+      border-color: color-mix(in oklch, var(--error) 25%, var(--border));
+      color: color-mix(in oklch, var(--error) 75%, var(--fg));
+    }
+    .banner-success {
+      background: color-mix(in oklch, var(--success) 6%, var(--bg));
+      border-color: color-mix(in oklch, var(--success) 25%, var(--border));
+      color: color-mix(in oklch, var(--success) 75%, var(--fg));
+    }
+
+    /* ─── 开关控制 (Switch Toggle) ───────────────────────────────────── */
+    .setting-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-block: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .setting-row:last-child {
+      border-bottom: none;
+    }
+    .setting-info .title {
+      font-weight: 500;
+      font-size: 13px;
+    }
+    .setting-info .desc {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 22px;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background-color: var(--border);
+      transition: .3s;
+      border-radius: 22px;
+    }
+    .slider::before {
+      content: "";
+      position: absolute;
+      height: 16px;
+      width: 16px;
+      left: 3px;
+      bottom: 3px;
+      background-color: var(--surface);
+      transition: .3s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: var(--accent);
+    }
+    input:checked + .slider::before {
+      transform: translateX(18px);
+    }
+
+    /* ─── 列表项和细节展示样式 ─────────────────────────────────────── */
+    .info-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .info-item {
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      transition: border-color 0.2s;
+    }
+    .info-item:hover {
+      border-color: var(--accent);
+    }
+    .info-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .info-badge {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: var(--fg-soft);
+      color: var(--muted);
+    }
+    .info-badge.primary {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+    .info-badge.success {
+      background: color-mix(in oklch, var(--success) 12%, transparent);
+      color: var(--success);
+    }
+    .info-badge.error {
+      background: color-mix(in oklch, var(--error) 12%, transparent);
+      color: var(--error);
+    }
+    .info-title {
+      font-weight: 500;
+      font-size: 13px;
+    }
+    .info-meta {
+      font-size: 11px;
+      color: var(--muted);
+    }
+    
+    /* 文件寄存上传区域 */
+    .upload-drag-area {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius-lg);
+      padding: 32px 20px;
+      text-align: center;
+      cursor: pointer;
+      background: color-mix(in oklch, var(--bg) 98%, var(--fg) 2%);
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .upload-drag-area:hover, .upload-drag-area.dragover {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+    .upload-drag-icon {
+      font-size: 32px;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    
+    /* 两栏联动面板样式 */
+    .master-detail {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 20px;
+      height: 520px;
+      overflow: hidden;
+    }
+    .master-list {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow-y: auto;
+      background: var(--surface);
+    }
+    .master-item {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: background 0.2s, border-left 0.2s;
+      border-left: 3px solid transparent;
+    }
+    .master-item:last-child {
+      border-bottom: none;
+    }
+    .master-item:hover {
+      background: var(--fg-soft);
+    }
+    .master-item.active {
+      background: var(--accent-soft);
+      border-left-color: var(--accent);
+    }
+    .detail-view {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      background: var(--surface);
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    
+    /* ─── 开发者控制台 (Chrome Console Demo) ────────────────────────── */
+    .console-panel {
+      position: absolute;
+      top: 38px;
+      right: -340px;
+      bottom: 0;
+      width: 340px;
+      background: #191816;
+      border-left: 1px solid var(--border);
+      z-index: 50;
+      transition: right 0.3s cubic-bezier(0.075, 0.82, 0.165, 1);
+      display: flex;
+      flex-direction: column;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: #9c9890;
+    }
+    .console-panel.active {
+      right: 0;
+    }
+    .console-header {
+      background: color-mix(in oklch, var(--bg) 95%, var(--fg) 5%);
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--fg);
+    }
+    .console-logs {
+      flex: 1;
+      padding: 12px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      background: #141311;
+    }
+    .console-log {
+      line-height: 1.4;
+      white-space: pre-wrap;
+    }
+    .console-log.info { color: #88d4e9; }
+    .console-log.success { color: #8cd07e; }
+    .console-log.warn { color: #e5c07b; }
+    .console-log.error { color: #f47e7e; }
+    .console-input-area {
+      border-top: 1px solid var(--border);
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #191816;
+    }
+    .console-prompt {
+      color: var(--accent);
+      font-weight: bold;
+    }
+    .console-input {
+      flex: 1;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Windows 11 客户端应用框 -->
+  <div class="client-frame">
+    
+    <!-- 标题栏 -->
+    <div class="titlebar">
+      <div class="window-title">
+        <span class="icon">𓇚</span>
+        <span>春晖的任意门 · Dokodemo Door (v1.3.0-RC)</span>
+      </div>
+      <div class="window-controls">
+        <div class="ctrl-btn minimize"></div>
+        <div class="ctrl-btn maximize"></div>
+        <div class="ctrl-btn close" onclick="alert('春晖的任意门：已最小化至系统托盘，保持后台静默运行')"></div>
+      </div>
+    </div>
+    
+    <!-- 应用实体 -->
+    <div class="client-body">
+      
+      <!-- 左侧边栏 -->
+      <aside class="sidebar">
+        <div>
+          <div class="logo-area">
+            <div class="brand-title">春晖任意门</div>
+            <div class="brand-subtitle">Dokodemo Door</div>
+          </div>
+          
+          <nav class="nav-list">
+            <div class="nav-item active" onclick="switchPanel('dashboard', this)">
+              <span class="icon">𓇚</span>
+              <span>首页简报</span>
+            </div>
+            <div class="nav-item" onclick="switchPanel('news', this)">
+              <span class="icon">𓅃</span>
+              <span>校园资讯</span>
+            </div>
+            <div class="nav-item" onclick="switchPanel('queries', this)">
+              <span class="icon">🔍</span>
+              <span>校园查询</span>
+            </div>
+            <div class="nav-item" onclick="switchPanel('archive', this)">
+              <span class="icon">𓅪</span>
+              <span>文件寄存</span>
+            </div>
+            <div class="nav-item" onclick="switchPanel('toolbox', this)">
+              <span class="icon">𓃠</span>
+              <span>班级工具</span>
+            </div>
+            <div class="nav-item" onclick="switchPanel('wallpaper', this)">
+              <span class="icon">𓆭</span>
+              <span>壁纸订阅</span>
+            </div>
+            <div class="nav-item" onclick="switchPanel('settings', this)">
+              <span class="icon">⚙</span>
+              <span>设置选项</span>
+            </div>
+          </nav>
+        </div>
+        
+        <div class="sidebar-footer">
+          <!-- 登录状态 -->
+          <div class="user-badge" id="userBadge" onclick="toggleLogin()">
+            <div class="avatar" id="userAvatar">🔑</div>
+            <div class="info">
+              <div class="name" id="userName">未登录一体机</div>
+              <div class="status" id="userStatus">点击登录绑定班级</div>
+            </div>
+          </div>
+          
+          <!-- 深色模式 -->
+          <div class="sidebar-btn" onclick="toggleTheme()">
+            <span class="theme-icon">🌘</span>
+            <span class="theme-text">深色模式</span>
+          </div>
+          
+          <!-- 关于我们 -->
+          <div class="sidebar-btn" onclick="alert('春晖的任意门\n\n新媒体社口播搭档工作室荣誉出品\n白马湖畔的青春守护工具。')">
+            <span>𓇚</span>
+            <span>关于我们</span>
+          </div>
+        </div>
+      </aside>
+      
+      <!-- 右侧主视口 -->
+      <main class="viewport" id="viewport">
+        
+        <!-- 1. 首页简报面板 -->
+        <div class="panel-view active" id="panel-dashboard">
+          <header>
+            <div class="page-eyebrow" id="cal-date">六月十五日 星期一 · 夏</div>
+            <h1 class="page-title" id="greeting-title">下午好，梓浩。</h1>
+          </header>
+          
+          <div class="grid-2-1">
+            <!-- 左侧核心卡片 -->
+            <div class="stack" style="display:flex; flex-direction:column; gap:20px;">
+              <!-- 每日寄语卡片 -->
+              <div class="card">
+                <div class="quote-box">
+                  <p class="quote-text" id="quoteText">“把自己当作珍珠，就时时有怕被埋没的痛苦；把自己当作泥土吧，让众人把你踩成一条路。”</p>
+                  <p class="quote-author" id="quoteAuthor">— 鲁迅</p>
+                </div>
+                <div style="text-align: right; margin-top:12px;">
+                  <button class="btn btn-secondary btn-sm" onclick="changeQuote()">换一句</button>
+                </div>
+              </div>
+              
+              <!-- 今日值周快捷高亮栏 -->
+              <div class="card">
+                <div class="card-title">
+                  <span>📅 今日值周简报</span>
+                  <span class="info-badge primary" onclick="switchPanel('queries', document.querySelectorAll('.nav-item')[2]); switchQueryTab('duty')" style="cursor:pointer;">查看完整表 ↗</span>
+                </div>
+                <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; font-size:12px;">
+                  <div style="background:var(--fg-soft); padding:10px; border-radius: var(--radius); text-align:center;">
+                    <div style="color:var(--muted); margin-bottom:4px;">行政值周</div>
+                    <div style="font-weight:500; font-size:14px; color:var(--accent);" id="dashDutyLeader">陈老师</div>
+                  </div>
+                  <div style="background:var(--fg-soft); padding:10px; border-radius: var(--radius); text-align:center;">
+                    <div style="color:var(--muted); margin-bottom:4px;">值周组员</div>
+                    <div style="font-weight:500; font-size:14px;" id="dashDutyStaff">张老师、王老师</div>
+                  </div>
+                  <div style="background:var(--accent-soft); padding:10px; border-radius: var(--radius); text-align:center;">
+                    <div style="color:var(--accent); margin-bottom:4px;">值周班级</div>
+                    <div style="font-weight:600; font-size:14px; color:var(--accent);" id="dashDutyClass">高一(12)班</div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- 快捷入口 -->
+              <div class="card" style="padding:0; overflow:hidden;">
+                <div class="portal-link" onclick="switchPanel('archive', document.querySelectorAll('.nav-item')[3]); switchArchiveTab('upload')">
+                  <div class="link-info">
+                    <span class="link-icon">☁</span>
+                    <div>
+                      <div class="link-title">逻辑分片寄存</div>
+                      <div class="link-desc">以 2MB 规格逻辑分片上传，自动获取 6 位数提取密码</div>
+                    </div>
+                  </div>
+                  <span class="arrow">→</span>
+                </div>
+                <div class="portal-link" onclick="alert('春晖图库：今日已同步仰山摄影社、白马湖晚霞精选素材 12 张，可在壁纸面板订阅。')">
+                  <div class="link-info">
+                    <span class="link-icon">🖼</span>
+                    <div>
+                      <div class="link-title">春晖图库</div>
+                      <div class="link-desc">白马湖经典风光地标与精选学生活动影集</div>
+                    </div>
+                  </div>
+                  <span class="arrow">→</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- 右侧历法和天气 -->
+            <div class="stack" style="display:flex; flex-direction:column; gap:20px;">
+              <div class="card" style="text-align: center;">
+                <div style="font-family: var(--font-mono); font-size: 36px; font-weight: normal; color: var(--accent);" id="digital-clock">05:19:55</div>
+                <div style="font-size: 12px; color: var(--muted); margin-top: 6px;">上虞白马湖畔 · 校园多媒体一体机端</div>
+                
+                <div style="border-top:1px solid var(--border); margin-block:12px; padding-top:12px; text-align: left; font-size: 12px; color:var(--muted); display:flex; flex-direction:column; gap:6px;">
+                  <div>农历：丙午年五月初一</div>
+                  <div>节气：夏至后三日 · 蝉始鸣</div>
+                  <div>天气：晴 26℃ ~ 32℃ · 东南风</div>
+                </div>
+              </div>
+              
+              <!-- 系统公告 -->
+              <div class="card">
+                <div class="card-title">
+                  <span>系统公告</span>
+                  <a href="#" style="font-size:11px; color:var(--accent);" onclick="alert('一体机系统手册：如网络异常，本程序将启动 10s 超时防护与 3 次延迟重试。')">说明</a>
+                </div>
+                <div id="announcement-area" style="font-size:12px; line-height:1.5; color: var(--muted); min-height:60px;">
+                  <div style="border-bottom: 1px solid var(--border); padding-bottom:8px; margin-bottom:8px;">
+                    <span style="color:var(--accent); font-weight:500;">[公示]</span> 仰山校园网将于本周六凌晨2点维护。
+                  </div>
+                  <div>
+                    <span style="color:var(--success); font-weight:500;">[提示]</span> 本学期卫生宿舍楼宇考核编码映射已更新。
+                  </div>
+                </div>
+                <button class="btn btn-secondary" style="width:100%; font-size:11px; padding:6px 0; margin-top:8px;" onclick="readAllAnnouncements()">全部设为已读</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. 校园资讯面板 -->
+        <div class="panel-view" id="panel-news">
+          <header>
+            <div class="page-eyebrow">News & Bulletin</div>
+            <h1 class="page-title">校园资讯与公告</h1>
+          </header>
+          
+          <div class="master-detail">
+            <!-- 左侧新闻栏目/文章列表 -->
+            <div class="master-list" id="newsMasterList">
+              <div style="padding:12px; border-bottom:1px solid var(--border); display:flex; gap:8px;">
+                <select class="select-input" style="padding:6px 8px; font-size:12px;" id="newsColumnSelect" onchange="loadNewsList()">
+                  <option value="19">19 - 校内公示</option>
+                  <option value="13">13 - 新闻聚焦</option>
+                  <option value="51">51 - 值周小结</option>
+                </select>
+              </div>
+              <div id="newsItemsContainer">
+                <!-- 由 JS 渲染 -->
+              </div>
+            </div>
+            
+            <!-- 右侧正文及详情 -->
+            <div class="detail-view" id="newsDetailView">
+              <!-- 初始提示 -->
+              <div style="margin:auto; text-align:center; color:var(--muted);">
+                <span style="font-size:24px;">📄</span>
+                <div style="font-size:13px; margin-top:12px;">请从左侧列表选择一篇文章进行查阅</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. 校园查询面板 -->
+        <div class="panel-view" id="panel-queries">
+          <header>
+            <div class="page-eyebrow">School Database</div>
+            <h1 class="page-title">校园考评与值周查询</h1>
+          </header>
+          
+          <div class="tab-header">
+            <span class="tab-btn active" onclick="switchQueryTab('duty', this)">值周排班 (`duty`)</span>
+            <span class="tab-btn" onclick="switchQueryTab('hygiene', this)">纪律卫生 (`hygiene`)</span>
+            <span class="tab-btn" onclick="switchQueryTab('bedroom', this)">寝室考评 (`bedroom`)</span>
+            <span class="tab-btn" onclick="switchQueryTab('lostfound', this)">失物招领 (`lostfound`)</span>
+          </div>
+
+          <!-- A. 值周排班 Tab -->
+          <div class="query-tab-content" id="query-duty">
+            <div class="grid-1-2">
+              <!-- 左侧操作与搜索 -->
+              <div class="card" style="display:flex; flex-direction:column; gap:14px; height:fit-content;">
+                <h3 style="font-size:14px; font-weight:600; margin:0;">值周检索引擎</h3>
+                <div class="form-group">
+                  <label for="dutySearchInput">模糊搜索教师/班级</label>
+                  <div class="input-wrapper">
+                    <input type="text" class="text-input" placeholder="输入老师名字或班级..." id="dutySearchInput" />
+                  </div>
+                </div>
+                <div style="display:flex; gap:8px;">
+                  <button class="btn btn-primary btn-sm" onclick="searchDuty()">开始检索</button>
+                  <button class="btn btn-secondary btn-sm" onclick="showCurrentWeekDuty()">当前周高亮</button>
+                </div>
+                <button class="btn btn-secondary btn-sm" style="width:100%;" onclick="showAllDuties()">列出整学期总表</button>
+              </div>
+              
+              <!-- 右侧结果展示 -->
+              <div class="card" style="min-height:300px; max-height:450px; overflow-y:auto;">
+                <div class="card-title">
+                  <span id="dutyResultTitle">当前周值周详情</span>
+                </div>
+                <div id="dutyResultContent" class="info-list">
+                  <!-- JS渲染 -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- B. 纪律卫生 Tab -->
+          <div class="query-tab-content" id="query-hygiene" style="display:none;">
+            <div class="grid-1-2">
+              <!-- 左侧筛选 -->
+              <div class="card" style="display:flex; flex-direction:column; gap:14px; height:fit-content;">
+                <h3 style="font-size:14px; font-weight:600; margin:0;">纪律卫生记录</h3>
+                <div class="form-group">
+                  <label for="hygieneClassFilter">指定检索班级</label>
+                  <select class="select-input" id="hygieneClassFilter" onchange="searchHygiene()">
+                    <option value="all">-- 全校范围 --</option>
+                    <option value="高一(12)班">高一(12)班</option>
+                    <option value="高一(10)班">高一(10)班</option>
+                    <option value="高二(3)班">高二(3)班</option>
+                    <option value="高三(1)班">高三(1)班</option>
+                  </select>
+                </div>
+                <button class="btn btn-primary btn-sm" onclick="searchHygiene()">查询考评记录</button>
+              </div>
+              
+              <!-- 右侧展示 -->
+              <div class="card" style="min-height:300px; max-height:450px; overflow-y:auto;">
+                <div class="card-title">考评得分与扣分项明细</div>
+                <div id="hygieneResultList" class="info-list">
+                  <!-- JS渲染 -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- C. 寝室与宿舍考评 Tab -->
+          <div class="query-tab-content" id="query-bedroom" style="display:none;">
+            <div class="grid-2">
+              <!-- 1. 班级寝室检索 -->
+              <div class="card">
+                <div class="card-title">🏢 班级寝室房号检索</div>
+                <div class="grid-2">
+                  <div class="form-group">
+                    <label>年级阶段</label>
+                    <select class="select-input" id="bedGradeSelect">
+                      <option value="1">1 - 高一</option>
+                      <option value="2">2 - 高二</option>
+                      <option value="3">3 - 高三</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>班级序号 (数字)</label>
+                    <input type="number" class="text-input" value="12" min="1" max="24" id="bedClassNum" />
+                  </div>
+                </div>
+                <button class="btn btn-primary btn-sm" style="width:100%; margin-top:10px;" onclick="queryClassBedrooms()">查询所属寝室分配</button>
+                <div id="classBedResult" style="margin-top:16px; font-size:12px; color:var(--muted); line-height:1.6;"></div>
+              </div>
+
+              <!-- 2. 宿舍楼宇考评 -->
+              <div class="card">
+                <div class="card-title">🧹 宿舍楼宇卫生与纪律</div>
+                <div class="form-group">
+                  <label>考核楼宇</label>
+                  <select class="select-input" id="buildingSelect">
+                    <option value="1">1 号楼 (对应 1 号楼/女寝)</option>
+                    <option value="3">3 号楼 (对应 5 号楼/男寝)</option>
+                    <option value="9">9 号楼 (对应 3 号楼/混合)</option>
+                  </select>
+                </div>
+                <div class="grid-2">
+                  <div class="form-group">
+                    <label>起始日期</label>
+                    <input type="date" class="text-input" style="padding:6px 10px;" id="bedStartDate" value="2026-06-01" />
+                  </div>
+                  <div class="form-group">
+                    <label>结束日期</label>
+                    <input type="date" class="text-input" style="padding:6px 10px;" id="bedEndDate" value="2026-06-15" />
+                  </div>
+                </div>
+                <div class="setting-row" style="padding-block:6px; border:none;">
+                  <div class="setting-info">
+                    <div class="title" style="font-size:12px;">过滤显示全部寝室 (包含未扣分)</div>
+                  </div>
+                  <label class="switch" style="transform: scale(0.85);">
+                    <input type="checkbox" id="bedShowAllSwitch">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <button class="btn btn-primary btn-sm" style="width:100%;" onclick="queryBuildingHygiene()">检索楼宇考评明细</button>
+              </div>
+            </div>
+            
+            <!-- 楼宇考评展示区 -->
+            <div class="card" style="margin-top:20px; min-height:150px; max-height:250px; overflow-y:auto;">
+              <div class="card-title" id="buildingResultTitle">宿舍楼宇考核结果</div>
+              <div id="buildingResultContent" class="info-list">
+                <div style="text-align:center; color:var(--muted); font-size:12px; padding-block:20px;">
+                  设置上方参数并点击检索按钮
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- D. 失物招领 Tab -->
+          <div class="query-tab-content" id="query-lostfound" style="display:none;">
+            <div class="grid-1-2">
+              <div class="card" style="display:flex; flex-direction:column; gap:14px; height:fit-content;">
+                <h3 style="font-size:14px; font-weight:600; margin:0;">失物招领中心</h3>
+                <div class="form-group">
+                  <label for="lfIdInput">根据登记 ID 查询详情</label>
+                  <input type="text" class="text-input" placeholder="例如: LF-402" id="lfIdInput" />
+                </div>
+                <button class="btn btn-primary btn-sm" onclick="queryLostFoundDetails()">检索招领详情</button>
+                <div style="font-size:11px; color:var(--muted); line-height:1.4;">
+                  支持别名 `lf` 查询。登记ID可在右侧列表中查看。
+                </div>
+              </div>
+              
+              <div class="card" style="min-height:300px; max-height:450px; overflow-y:auto;">
+                <div class="card-title">最新登记物品列表</div>
+                <div id="lostFoundList" class="info-list">
+                  <!-- JS渲染 -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- 4. 文件归档面板 -->
+        <div class="panel-view" id="panel-archive">
+          <header>
+            <div class="page-eyebrow">The Archive</div>
+            <h1 class="page-title">归档与文件提取</h1>
+          </header>
+          
+          <div class="tab-header">
+            <span class="tab-btn active" onclick="switchArchiveTab('code', this)">提取码下载</span>
+            <span class="tab-btn" onclick="switchArchiveTab('upload', this)">逻辑分片寄存</span>
+            <span class="tab-btn" onclick="switchArchiveTab('message', this)">收件箱邮件附件</span>
+          </div>
+          
+          <div class="card">
+            <!-- 提取码 Tab -->
+            <div class="tab-content" id="archive-code">
+              <p style="font-size:13px; color:var(--muted); margin-top:0; margin-bottom:20px;">
+                在下方输入由本客户端或 CLI 工具生成的 6 位数文件提取密码，高速提取并归档课堂教学资料。
+              </p>
+              
+              <div class="download-section">
+                <div class="input-wrapper" style="max-width: 480px; margin-inline: auto;">
+                  <input type="text" class="text-input" placeholder="输入 6 位数字提取密码 (例如: 849301)" id="downloadCode" />
+                  <button class="btn btn-primary" style="position: absolute; right: 4px; padding: 8px 14px;" onclick="startDownload()">安全提取</button>
+                </div>
+                
+                <div class="progress-bar-container" id="progressBarContainer" style="max-width: 480px; margin-inline: auto;">
+                  <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <div class="status-msg" id="downloadStatus"></div>
+              </div>
+            </div>
+            
+            <!-- 文件寄存分片上传 Tab -->
+            <div class="tab-content" id="archive-upload" style="display:none;">
+              <p style="font-size:13px; color:var(--muted); margin-top:0; margin-bottom:16px;">
+                拖拽文件至下方进行分片上传。系统将对文件进行 2MB 规格逻辑分片，独立包装后自动上传并触发服务器端文件合成。
+              </p>
+              
+              <div style="max-width:540px; margin-inline:auto;">
+                <div class="upload-drag-area" id="uploadDragArea" onclick="triggerFileInput()">
+                  <div class="upload-drag-icon">☁</div>
+                  <div style="font-weight:500; font-size:14px; margin-bottom:4px;">拖拽文件到这里，或者点击选择文件</div>
+                  <div style="font-size:11px; color:var(--muted);">支持任何格式，大文件将自动切分为 2MB 数据分片上传</div>
+                  <input type="file" id="fileInputElement" style="display:none;" onchange="handleFileSelected(event)" />
+                </div>
+                
+                <!-- 上传进度控制 -->
+                <div id="uploadProgressSection" style="display:none; margin-top:20px;">
+                  <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:6px;">
+                    <span id="uploadFileName" style="font-weight:500;">文件名称.zip</span>
+                    <span id="uploadProgressPercent" style="color:var(--accent); font-weight:600;">0%</span>
+                  </div>
+                  <div class="progress-bar-container" id="uploadProgressContainer" style="display:block;">
+                    <div class="progress-bar" id="uploadProgressBar" style="width: 0%; background: var(--accent);"></div>
+                  </div>
+                  <div class="status-msg" id="uploadStatusMessage" style="text-align:center; margin-top:8px;"></div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- 站内短信 Tab -->
+            <div class="tab-content" id="archive-message" style="display:none;">
+              <!-- 错误提示 -->
+              <div class="banner banner-error" id="msgLoginWarning">
+                <span>🔑</span>
+                <div>
+                  <strong>尚未绑定一体机会话</strong><br>
+                  查询收件箱邮件前，请点击左侧边栏底部的登录按钮。账号密码通常贴在教室多媒体一体机屏幕边框上。
+                </div>
+              </div>
+              
+              <div id="messageFileList" style="display:none;">
+                <p style="font-size:13px; color:var(--muted); margin-top:0; margin-bottom:16px;">
+                  自动解析已绑定的收件箱消息中的附件。点击直接获取，免去浏览器“右键另存为”操作。
+                </p>
+                
+                <div style="border:1px solid var(--border); border-radius: var(--radius); overflow:hidden;">
+                  <div class="portal-link" style="padding-block:12px;">
+                    <div class="link-info">
+                      <span style="color:var(--accent);">📄</span>
+                      <div>
+                        <div style="font-size:13px; font-weight:500;">高一(12)班口播搭档招新手册.docx</div>
+                        <div style="font-size:11px; color:var(--muted);">来自: 新媒体社社长 · 大小: 1.2 MB</div>
+                      </div>
+                    </div>
+                    <button class="btn btn-secondary btn-sm" onclick="simulateFileDownload('高一(12)班口播搭档招新手册.docx')">下载</button>
+                  </div>
+                  <div class="portal-link" style="padding-block:12px;">
+                    <div class="link-info">
+                      <span style="color:var(--accent);">📊</span>
+                      <div>
+                        <div style="font-size:13px; font-weight:500;">第六周白马湖团日活动策划.xlsx</div>
+                        <div style="font-size:11px; color:var(--muted);">来自: 团支书 · 大小: 84 KB</div>
+                      </div>
+                    </div>
+                    <button class="btn btn-secondary btn-sm" onclick="simulateFileDownload('第六周白马湖团日活动策划.xlsx')">下载</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+
+        <!-- 5. 班级工具面板 -->
+        <div class="panel-view" id="panel-toolbox">
+          <header>
+            <div class="page-eyebrow">The Toolkit</div>
+            <h1 class="page-title">班级互动工具箱</h1>
+          </header>
+          
+          <div class="tab-header">
+            <span class="tab-btn active" onclick="switchToolTab('lottery', this)">学号随机抽签</span>
+            <span class="tab-btn" onclick="switchToolTab('truth', this)">真心话大冒险</span>
+          </div>
+          
+          <!-- 随机抽奖 Tab -->
+          <div class="tab-content" id="tool-lottery">
+            <div class="grid-2-1">
+              <div class="card lottery-grid">
+                <div class="luck-card">
+                  <div class="card-label">SELECTED ID</div>
+                  <div class="card-number" id="lotteryNumber">00</div>
+                  <div class="card-decor">春晖中学白马湖畔</div>
+                </div>
+                
+                <div style="display:flex; gap:12px;">
+                  <button class="btn btn-primary" id="btnStartLottery" onclick="runLottery()">开始抽取</button>
+                  <button class="btn btn-secondary" onclick="resetLottery()">复位</button>
+                </div>
+              </div>
+              
+              <div class="card" style="display:flex; flex-direction:column; gap:16px;">
+                <h3 style="font-size: 15px; font-weight:600; margin:0;">课堂点名配置</h3>
+                <div class="setting-row" style="padding-block:8px;">
+                  <div class="setting-info">
+                    <div class="title" style="font-size:13px;">班级总人数</div>
+                  </div>
+                  <input type="number" class="text-input" style="width: 80px; padding: 6px;" value="55" min="1" max="100" id="classSize" />
+                </div>
+                <div class="setting-row" style="padding-block:8px; border:none;">
+                  <div class="setting-info">
+                    <div class="title" style="font-size:13px;">水墨散开动效</div>
+                  </div>
+                  <label class="switch">
+                    <input type="checkbox" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div style="font-size:12px; color:var(--muted); line-height:1.5;">
+                  开启后抽签滚动时，数字的变化会有类似江南宣纸水墨晕染的过渡感，极具东方古典与现代书卷气。
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 真心话大冒险 Tab -->
+          <div class="tab-content" id="tool-truth" style="display:none;">
+            <p style="font-size:13px; color:var(--muted); margin-top:0; margin-bottom:20px; text-align:center;">
+              点击最上面的卡牌即可将其划走，抽取全新的真心话大冒险题目，适用于班会或新媒体破冰。
+            </p>
+            
+            <div class="card-stack-container" id="cardStack">
+              <!-- 卡牌由 JS 动态渲染 -->
+            </div>
+            
+            <div style="text-align: center; margin-top: 16px;">
+              <button class="btn btn-secondary" onclick="resetCardStack()">重置卡牌堆</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. 壁纸订阅面板 -->
+        <div class="panel-view" id="panel-wallpaper">
+          <header>
+            <div class="page-eyebrow">Wallpaper</div>
+            <h1 class="page-title">白马湖每日壁纸订阅</h1>
+          </header>
+          
+          <!-- 加载中 -->
+          <div class="card" id="wallpaperLoading" style="display: block;">
+            <div class="loading-container">
+              <div class="loading-spinner"></div>
+              <div style="font-size: 13px; color: var(--muted);">正在从白马湖摄影社数据库拉取今日壁纸推荐...</div>
+            </div>
+          </div>
+          
+          <!-- 壁纸画廊 -->
+          <div class="stack" id="wallpaperGallery" style="display: none; gap: 20px;">
+            <div class="banner banner-warning" style="margin-bottom:0;">
+              <span>𓆭</span>
+              <div>
+                已成功订阅“春晖校园风光”频道。本程序将每天 06:00 自动将最新壁纸同步为您的 Windows/macOS 桌面背景。
+              </div>
+            </div>
+            
+            <div class="wallpaper-grid">
+              <div class="wallpaper-item" onclick="setWallpaper('仰山山麓.jpg')">
+                <div class="ph-img" style="background: linear-gradient(135deg, #c96442, #e8e5df);">仰山山麓</div>
+                <div class="item-overlay">
+                  <div class="item-title">仰山山麓的夏日绿荫 ↗</div>
+                </div>
+              </div>
+              <div class="wallpaper-item" onclick="setWallpaper('白马湖畔.jpg')">
+                <div class="ph-img" style="background: linear-gradient(135deg, #d1913c, #fbf9f4);">白马湖畔</div>
+                <div class="item-overlay">
+                  <div class="item-title">白马湖畔的温柔晚霞 ↗</div>
+                </div>
+              </div>
+              <div class="wallpaper-item" onclick="setWallpaper('春晖长廊.jpg')">
+                <div class="ph-img" style="background: linear-gradient(135deg, #4f7a5e, #e8e5df);">春晖长廊</div>
+                <div class="item-overlay">
+                  <div class="item-title">雨后的春晖曲径长廊 ↗</div>
+                </div>
+              </div>
+            </div>
+            
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+              <span style="font-size:12px; color:var(--muted);">数据源: 春晖中学新媒体社摄影资源库 (每日更新)</span>
+              <button class="btn btn-primary" onclick="alert('壁纸成功下载！已平滑更换您的桌面壁纸。')">
+                <span>🔄</span> 设置每日自动轮播
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 7. 设置选项面板 -->
+        <div class="panel-view" id="panel-settings">
+          <header>
+            <div class="page-eyebrow">Settings</div>
+            <h1 class="page-title">客户端系统设置</h1>
+          </header>
+          
+          <div class="stack" style="display:flex; flex-direction:column; gap:20px;">
+            <!-- 基础设置 -->
+            <div class="card">
+              <h3 style="font-size: 14px; font-weight:600; margin-bottom: 8px;">基础设置</h3>
+              <div class="setting-row">
+                <div class="setting-info">
+                  <div class="title">开机自动启动</div>
+                  <div class="desc">在 Windows 系统开机后，本软件自动随系统并在后台静默启动。</div>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="setLaunch" checked onchange="toggleSetting('Launch')">
+                  <span class="slider"></span>
+                </label>
+              </div>
+              
+              <div class="setting-row">
+                <div class="setting-info">
+                  <div class="title">全屏教学自适应静默</div>
+                  <div class="desc">当检测到系统处于 PPT 播放或白板教学时，自动静默所有弹窗和通知。</div>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="setSilent" checked onchange="toggleSetting('Silent')">
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+            
+            <!-- 功能设置 -->
+            <div class="card">
+              <h3 style="font-size: 14px; font-weight:600; margin-bottom: 8px;">壁纸与订阅</h3>
+              <div class="setting-row">
+                <div class="setting-info">
+                  <div class="title">每日壁纸自动切换</div>
+                  <div class="desc">后台自适应平滑将最新的白马湖壁纸绑定为您的物理桌面壁纸。</div>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="setWallpaper" checked onchange="toggleSetting('Wallpaper')">
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+            
+            <!-- 调试与开发设置 -->
+            <div class="card">
+              <h3 style="font-size: 14px; font-weight:600; margin-bottom: 8px; color: var(--accent);">开发与调试设置</h3>
+              <div class="setting-row" style="border:none;">
+                <div class="setting-info">
+                  <div class="title">内置 Tauri Webview2 调试控制台</div>
+                  <div class="desc">打开侧边栏日志控制台以实时观察底层 API 超时与重试握手请求。</div>
+                </div>
+                <button class="btn btn-secondary btn-sm" onclick="toggleConsole()">打开面板</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </main>
+      
+      <!-- Built-in DevTools Console Simulator -->
+      <div class="console-panel" id="consolePanel">
+        <div class="console-header">
+          <span>Tauri Web Inspector</span>
+          <button style="color:var(--error); font-weight:bold; background:none; cursor:pointer;" onclick="toggleConsole()">✕</button>
+        </div>
+        <div class="console-logs" id="consoleLogs">
+          <div class="console-log info">[Tauri] Loading core packages...</div>
+          <div class="console-log info">[Tauri] Initializing webview2 backend core...</div>
+          <div class="console-log success">[Tauri] Rust backend connected successfully via ipc channel.</div>
+          <div class="console-log success">[Tauri] Loaded plugin: chunhui-cli-core.</div>
+        </div>
+        <div class="console-input-area">
+          <span class="console-prompt">&gt;</span>
+          <input type="text" class="console-input" id="consoleInput" placeholder="输入 help 获得支持" onkeydown="handleConsoleInput(event)" />
+        </div>
+      </div>
+      
+    </div>
+  </div>
+
+  <script>
+    // ─── 数据库与状态 ──────────────────────────────────────────────────
+    let isDarkTheme = false;
+    let isLoggedIn = false;
+    let lotteryInterval = null;
+    let quotes = [
+      { text: "“把自己当作珍珠，就时时有怕被埋没的痛苦；把自己当作泥土吧，让众人把你踩成一条路。”", author: "鲁迅" },
+      { text: "“白马湖的黄昏，比白昼更有一种温柔。让人想在湖畔的长椅上，静静看最后一抹晚霞散去。”", author: "春晖纪实" },
+      { text: "“所谓任意门，不是为了逃离现在，而是为了让春晖的少年人无论走到哪里，推开门都能看见白马湖的春水。”", author: "口播搭档独白" },
+      { text: "“看不见的城市。在那些交织的廊道中，我们寻找的不是过往，而是我们在青春里彼此重逢的证据。”", author: "卡尔维诺" },
+      { text: "“对人性的剖析常常让我们羞愧，但唯有真诚的相待，才能在这个冷漠時代融化冰雪。”", author: "拉罗什富科" }
+    ];
+    let quoteIndex = 0;
+    
+    // 真心话大冒险题目数据
+    let cardTopics = [
+      { type: "truth", content: "向你的口播搭档说一句这学期你一直想说但没说出口的感谢。", tip: "真心话 · 点击将其划走" },
+      { type: "dare", content: "模仿新媒体社招新宣讲时的口吻，大声背诵一遍春晖校训：“与时俱进”。", tip: "大冒险 · 点击将其划走" },
+      { type: "truth", content: "分享你在春晖中学白马湖畔，做过的最浪漫或者最犯傻的一件事。", tip: "真心话 · 点击将其划走" },
+      { type: "dare", content: "闭上眼睛，转三圈，然后指向你右侧的同学，并赞美他/她最特别的一个优点。", tip: "大冒险 · 点击将其划走" },
+      { type: "truth", content: "如果你的任意门能通往未来十年后的任意一个地方，你最希望降落在哪里？", tip: "真心话 · 点击将其划走" },
+      { type: "dare", content: "现场为班级展示一个新媒体社推荐的“短视频专属手势舞”或任意才艺。", tip: "大冒险 · 点击将其划走" }
+    ];
+    let currentCards = [];
+
+    // ─── 校园资讯及公告模拟数据 ───────────────────────────────────────
+    let newsData = {
+      "19": [
+        { id: "1901", title: "关于做好第六周白马湖防溺水安全宣传的通知", date: "2026-06-12", author: "政教处", content: `<h3>各班级、各社团：</h3><p>夏季临近，防溺水安全教育刻不容缓。请各班主任在周一班会课期间利用本“多媒体一体机”播放安全防范警示视频，并组织全体学生认真阅读《春晖中学防溺水告家长书》。</p><p>相关防溺水讲座及课件已经通过文件寄存系统上传，班委会及团支部可凭提取码 <b>1208</b> 快速在“文件提取”面板进行极速下载，并在班内分发学习。</p><p>特此通知。</p>`, attachments: ["防溺水安全班会课件.pptx", "防溺水回执单.pdf"] },
+        { id: "1902", title: "白马湖多媒体教学一体机会话校验更新机制", date: "2026-06-10", author: "信息中心", content: `<p>为配合白马湖智慧校园网络升级，教学班级多媒体一体机终端现已启用新版 Cookie 校验机制。登录后会话将保留在本地，后续可直接免验证码访问校园资源。</p><p>如果系统异常，底层的 <b>chunhui-cil</b> 会自动在后台启动 10s 请求防护及 3 次超时重试。控制台会产生详细日志。</p>`, attachments: [] },
+        { id: "1903", title: "关于仰山学术报告厅周末学术研讨会场地预约的公示", date: "2026-06-08", author: "校办", content: `<p>本周末（6月17日-6月18日）仰山报告厅将承办全省高中语文教学研讨会。届时报告厅场地暂不对社团或班级预约开放，已提交申请的社团将被协调至实验楼多功能厅进行。</p><p>请相关社团负责人及时登录校园网系统确认协调方案。</p>`, attachments: ["研讨会日程表.docx"] }
+      ],
+      "13": [
+        { id: "1301", title: "春晖中学第32届社团联合招新大会火热开启", date: "2026-06-14", author: "团委 / 新媒体社", content: `<p>白马湖畔，群英荟萃！春晖中学第32届社团招新将于本周五下午在仰山广场拉开帷幕。从古风悠扬的国学社，到现代感十足的机器人俱乐部，更有新媒体社携手口播搭档工作室进行现场直播招新宣讲。</p><p>加入我们，用文字记录青春，用镜头框住白马湖的四季风光！</p>`, attachments: ["社团招新大表.xlsx"] },
+        { id: "1302", title: "我校在“白马湖杯”中学生创意摄影大赛中再创佳绩", date: "2026-06-11", author: "白马湖摄影社", content: `<p>在刚刚落幕的第十届“白马湖杯”摄影大奖赛中，我校摄影社成员提交的作品《仰山山麓的绿荫》和《白马湖畔的温柔晚霞》荣获一等奖。这些作品已经由新媒体社同步录入到客户端壁纸推荐列表中，同学们可以在“壁纸订阅”面板中一键将其设为本地桌面背景，每日轮播换新。</p>`, attachments: ["获奖作品原图大礼包.zip"] }
+      ],
+      "51": [
+        { id: "5101", title: "第五周行政值周总结与整改意见通报", date: "2026-06-09", author: "校值周组", content: `<p>上周（第五周）行政值周总体情况良好。绝大多数班级在早自修及卫生清扫环节表现优异。但在纪律考核方面仍存在个别问题：</p><p><b>重点整改：</b>部分男寝（尤其是5号楼3楼区域）在内务检查中被扣分，主要表现在鞋子摆放不整齐及垃圾未倾倒。请高一各班级宿管委员加强督导，寝室考评详情可通过“寝室考评”进行按楼宇和班级房号的一键导出与查询。</p>`, attachments: ["第五周扣分寝室一览.xlsx"] }
+      ]
+    };
+
+    // ─── 校园查询模拟数据 ───────────────────────────────────────────
+    let dutyData = [
+      { week: 1, leader: "陈老师", staff: "张老师、王老师", cls: "高一(12)班", note: "第一周教学常规检查" },
+      { week: 2, leader: "李老师", staff: "周老师、赵老师", cls: "高一(10)班", note: "消防演练及宿舍防火排查" },
+      { week: 3, leader: "陈老师", staff: "刘老师、钱老师", cls: "高二(3)班", note: "仰山报告厅设备演练" },
+      { week: 4, leader: "王老师", staff: "孙老师、郑老师", cls: "高二(5)班", note: "白马湖环保周专项检查" },
+      { week: 5, leader: "徐老师", staff: "黄老师、吴老师", cls: "高三(1)班", note: "高三第一次模拟考试纪律" },
+      { week: 6, leader: "陈老师", staff: "张老师、王老师", cls: "高一(12)班", note: "白马湖防溺水安全周（当前周次）" }
+    ];
+
+    let hygieneRecords = [
+      { id: "HYG-102", title: "高一(12)班 纪律卫生考评", date: "2026-06-12", score: "9.5分", detail: "扣分原因：早操有1人迟到。检查人：值周组老师" },
+      { id: "HYG-103", title: "高一(10)班 纪律卫生考评", date: "2026-06-12", score: "9.0分", detail: "扣分原因：卫生死角（讲台下方有纸屑未清扫）。检查人：值周学生" },
+      { id: "HYG-104", title: "高二(3)班 纪律卫生考评", date: "2026-06-11", score: "10.0分", detail: "表现优异：全部打扫干净，内务整洁。检查人：值周学生" },
+      { id: "HYG-105", title: "高一(12)班 纪律卫生考评", date: "2026-06-10", score: "10.0分", detail: "表现优异：桌椅整齐，黑板擦洗干净。检查人：行政检查" }
+    ];
+
+    let bedroomAllocation = {
+      "1-12": ["301寝室", "302寝室", "303寝室", "304寝室 (女寝)", "305寝室 (女寝)"],
+      "1-10": ["306寝室", "307寝室", "308寝室", "309寝室 (女寝)"],
+      "2-3": ["401寝室", "402寝室", "403寝室", "404寝室"]
+    };
+
+    let buildingHygieneData = {
+      // 1号楼 (对应 1 号楼/女寝)
+      "1": [
+        { room: "101寝室", score: "10分", start: "2026-06-01", end: "2026-06-15", logs: "无扣分记录" },
+        { room: "102寝室", score: "9.0分", start: "2026-06-02", end: "2026-06-12", logs: "扣1分：地面水渍未拖干" }
+      ],
+      // 3号楼 (对应 5 号楼/男寝)
+      "3": [
+        { room: "301寝室", score: "8.5分", start: "2026-06-05", end: "2026-06-09", logs: "扣1.5分：鞋子摆放混乱，垃圾满溢" },
+        { room: "302寝室", score: "10分", start: "2026-06-01", end: "2026-06-15", logs: "无扣分记录" },
+        { room: "303寝室", score: "9.0分", start: "2026-06-08", end: "2026-06-12", logs: "扣1.0分：被子叠放不合格" }
+      ],
+      // 9号楼 (对应 3 号楼)
+      "9": [
+        { room: "201寝室", score: "10分", start: "2026-06-01", end: "2026-06-15", logs: "无扣分记录" },
+        { room: "202寝室", score: "8.0分", start: "2026-06-03", end: "2026-06-11", logs: "扣2分：宿舍内擅自违规接线板" }
+      ]
+    };
+
+    let lostFoundData = [
+      { id: "LF-401", title: "丢失：黑色黑框近视眼镜", finder: "高一(12)班 梓浩", date: "2026-06-14", place: "仰山报告厅最后一排", contact: "多媒体讲台留言板", status: "寻找中" },
+      { id: "LF-402", title: "捡到：蓝色天堂遮阳伞一把", finder: "保卫处保安大叔", date: "2026-06-13", place: "白马湖畔长廊木椅", contact: "校门口保卫处凭描述领取", status: "待领" },
+      { id: "LF-403", title: "捡到：仰山食堂二楼一卡通卡片", finder: "高二(3)班 李同学", date: "2026-06-12", place: "仰山食堂二楼餐盘回收处", contact: "已交至一卡通服务中心", status: "已领" }
+    ];
+
+    // ─── 初始化 ──────────────────────────────────────────────────────
+    window.addEventListener('load', () => {
+      // 启动时钟
+      setInterval(updateClock, 1000);
+      updateClock();
+      
+      // 模拟壁纸加载
+      setTimeout(() => {
+        document.getElementById('wallpaperLoading').style.display = 'none';
+        document.getElementById('wallpaperGallery').style.display = 'block';
+        logConsole('Tauri IPC: 壁纸资源库连接成功，加载 3 张高清壁纸。', 'success');
+      }, 1200);
+
+      // 初始化各版块数据
+      loadNewsList();
+      showCurrentWeekDuty();
+      searchHygiene();
+      loadLostFoundList();
+      resetCardStack();
+      
+      logConsole('春晖的任意门 Web-Prototype 成功挂载。', 'info');
+      logConsole('Tauri IPC 机制就绪。10s 请求保护与 3 次重试重连已绑定后台。', 'success');
+    });
+
+    // ─── 核心面板切换 ─────────────────────────────────────────────────
+    function switchPanel(panelId, element) {
+      // 隐藏所有面板
+      const panels = document.querySelectorAll('.panel-view');
+      panels.forEach(p => p.classList.remove('active'));
+      
+      // 显示目标面板
+      const targetPanel = document.getElementById(`panel-${panelId}`);
+      if (targetPanel) {
+        targetPanel.classList.add('active');
+      }
+
+      // 更新侧边栏导航高亮
+      const navItems = document.querySelectorAll('.nav-item');
+      navItems.forEach(item => item.classList.remove('active'));
+      element.classList.add('active');
+      
+      logConsole(`Tauri 路由：切换至视图面板 [${panelId}]`, 'info');
+    }
+
+    // ─── 电子时钟与日历 ───────────────────────────────────────────────
+    function updateClock() {
+      const clockEl = document.getElementById('digital-clock');
+      const now = new Date();
+      let h = now.getHours().toString().padStart(2, '0');
+      let m = now.getMinutes().toString().padStart(2, '0');
+      let s = now.getSeconds().toString().padStart(2, '0');
+      clockEl.textContent = `${h}:${m}:${s}`;
+    }
+
+    // ─── 名言切换 ────────────────────────────────────────────────────
+    function changeQuote() {
+      quoteIndex = (quoteIndex + 1) % quotes.length;
+      const textEl = document.getElementById('quoteText');
+      const authEl = document.getElementById('quoteAuthor');
+      
+      // 用轻微的淡入淡出动画过渡
+      textEl.style.opacity = 0;
+      authEl.style.opacity = 0;
+      
+      setTimeout(() => {
+        textEl.textContent = quotes[quoteIndex].text;
+        authEl.textContent = quotes[quoteIndex].author;
+        textEl.style.opacity = 1;
+        authEl.style.opacity = 1;
+      }, 200);
+      
+      logConsole(`校园寄语切换："${quotes[quoteIndex].author}" 语录`, 'info');
+    }
+
+    // ─── 公告设为已读 ─────────────────────────────────────────────────
+    function readAllAnnouncements() {
+      const area = document.getElementById('announcement-area');
+      area.innerHTML = '<div style="color:var(--success); font-size:12px; display:flex; align-items:center; gap:6px;"><span>✓</span> 所有公告均已标记为已读。</div>';
+      logConsole('控制中心：清理全部未读公告通知标记。', 'success');
+    }
+
+    // ─── 登录状态模拟 ─────────────────────────────────────────────────
+    function toggleLogin() {
+      isLoggedIn = !isLoggedIn;
+      const avatar = document.getElementById('userAvatar');
+      const name = document.getElementById('userName');
+      const status = document.getElementById('userStatus');
+      
+      const loginWarning = document.getElementById('msgLoginWarning');
+      const messageFileList = document.getElementById('messageFileList');
+      
+      if (isLoggedIn) {
+        avatar.textContent = '🏫';
+        name.textContent = '高一(12)班 班级一体机';
+        status.textContent = '已通过仰山校园网鉴权';
+        
+        if(loginWarning) loginWarning.style.display = 'none';
+        if(messageFileList) messageFileList.style.display = 'block';
+        logConsole('Tauri Auth: 一体机网络会话鉴权通过，Cookie 已加密写入本地 db.json。', 'success');
+      } else {
+        avatar.textContent = '🔑';
+        name.textContent = '未登录一体机';
+        status.textContent = '点击登录绑定班级';
+        
+        if(loginWarning) loginWarning.style.display = 'flex';
+        if(messageFileList) messageFileList.style.display = 'none';
+        logConsole('Tauri Auth: 已清除本地 Session 会话 Cookie，站内信附件访问锁闭。', 'warn');
+      }
+    }
+
+    // ─── 深色模式切换 ─────────────────────────────────────────────────
+    function toggleTheme() {
+      isDarkTheme = !isDarkTheme;
+      const icon = document.querySelector('.theme-icon');
+      const text = document.querySelector('.theme-text');
+      
+      if (isDarkTheme) {
+        document.documentElement.classList.add('dark-theme');
+        icon.textContent = '☀️';
+        text.textContent = '浅色模式';
+        logConsole('主题配置：已启用深色夜间护眼模式。', 'info');
+      } else {
+        document.documentElement.classList.remove('dark-theme');
+        icon.textContent = '🌘';
+        text.textContent = '深色模式';
+        logConsole('主题配置：已恢复日光书卷亮色模式。', 'info');
+      }
+    }
+
+    // ─── 校园资讯新闻渲染 ──────────────────────────────────────────────
+    function loadNewsList() {
+      const colVal = document.getElementById('newsColumnSelect').value;
+      const container = document.getElementById('newsItemsContainer');
+      const data = newsData[colVal] || [];
+      
+      container.innerHTML = '';
+      data.forEach((article, idx) => {
+        const item = document.createElement('div');
+        item.className = `master-item ${idx === 0 ? 'active' : ''}`;
+        item.innerHTML = `
+          <div style="font-weight: 500; font-size:13px; margin-bottom:4px; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${article.title}</div>
+          <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--muted);">
+            <span>${article.author}</span>
+            <span>${article.date}</span>
+          </div>
+        `;
+        item.onclick = () => {
+          document.querySelectorAll('#newsItemsContainer .master-item').forEach(m => m.classList.remove('active'));
+          item.classList.add('active');
+          showNewsDetails(article);
+        };
+        container.appendChild(item);
+      });
+      
+      if (data.length > 0) {
+        showNewsDetails(data[0]);
+      } else {
+        document.getElementById('newsDetailView').innerHTML = `
+          <div style="margin:auto; text-align:center; color:var(--muted);">暂无新闻内容</div>
+        `;
+      }
+      logConsole(`Tauri API: 拉取新闻栏目 [${colVal}] 文章列表成功`, 'success');
+    }
+
+    function showNewsDetails(article) {
+      const view = document.getElementById('newsDetailView');
+      let attsHtml = '';
+      if (article.attachments && article.attachments.length > 0) {
+        attsHtml = `
+          <div style="margin-top:20px; border-top:1px solid var(--border); padding-top:16px;">
+            <div style="font-size:12px; font-weight:600; color:var(--accent); margin-bottom:10px;">📎 关联附件 (${article.attachments.length}个)</div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              ${article.attachments.map(att => `
+                <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 12px; border:1px solid var(--border); border-radius:var(--radius); background:var(--bg); font-size:12px;">
+                  <span>${att}</span>
+                  <button class="btn btn-secondary btn-sm" style="padding:4px 8px;" onclick="simulateFileDownload('${att}')">下载附件</button>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+      
+      view.innerHTML = `
+        <div style="border-bottom:1px solid var(--border); padding-bottom:12px;">
+          <h2 style="font-family:var(--font-display); font-size:18px; font-weight:normal; margin:0 0 8px 0; line-height:1.4;">${article.title}</h2>
+          <div style="font-size:11px; color:var(--muted); display:flex; gap:16px;">
+            <span>发布者: ${article.author}</span>
+            <span>日期: ${article.date}</span>
+            <span>文章ID: ${article.id}</span>
+          </div>
+        </div>
+        <div style="flex:1; font-size:13px; line-height:1.7; color:var(--fg); overflow-y:auto; padding-top:4px;">
+          ${article.content}
+        </div>
+        ${attsHtml}
+      `;
+      logConsole(`Tauri API: 解析阅读文章 [${article.id}] 详情及 HTML 链接锚文本成功`, 'info');
+    }
+
+    // ─── 校园查询逻辑（值周、纪律卫生、寝室楼宇、失物招领） ───────────────
+    function switchQueryTab(tabId, element) {
+      if (element) {
+        const btns = element.parentNode.querySelectorAll('.tab-btn');
+        btns.forEach(b => b.classList.remove('active'));
+        element.classList.add('active');
+      }
+      
+      const contents = document.querySelectorAll('#panel-queries .query-tab-content');
+      contents.forEach(c => c.style.display = 'none');
+      document.getElementById(`query-${tabId}`).style.display = 'block';
+      
+      logConsole(`校园查询：切入子功能模块 [${tabId}]`, 'info');
+    }
+
+    // 值周排班查询
+    function showCurrentWeekDuty() {
+      document.getElementById('dutyResultTitle').textContent = "第六周值周安排表 (当前周次高亮)";
+      const container = document.getElementById('dutyResultContent');
+      container.innerHTML = '';
+      
+      dutyData.forEach(item => {
+        const isCurrent = item.week === 6;
+        const el = document.createElement('div');
+        el.className = 'info-item';
+        if (isCurrent) {
+          el.style.borderColor = 'var(--accent)';
+          el.style.background = 'var(--accent-soft)';
+        }
+        el.innerHTML = `
+          <div class="info-header">
+            <span class="info-title" style="${isCurrent ? 'color:var(--accent); font-weight:600;' : ''}">第 ${item.week} 周值周安排</span>
+            <span class="info-badge ${isCurrent ? 'primary' : ''}">${isCurrent ? '当前周高亮' : '常态'}</span>
+          </div>
+          <div style="font-size:12px; margin-top:6px; display:grid; grid-template-columns: repeat(2, 1fr); gap:6px;">
+            <div><b>行政值周:</b> ${item.leader}</div>
+            <div><b>值周班级:</b> ${item.cls}</div>
+            <div style="grid-column: span 2;"><b>值周组员:</b> ${item.staff}</div>
+            <div style="grid-column: span 2; color:var(--muted); font-style:italic;">工作重点: ${item.note}</div>
+          </div>
+        `;
+        container.appendChild(el);
+      });
+      logConsole("Tauri IPC: 执行 'python3 ch_cli.py duty'，已在终端高亮当前周。", "success");
+    }
+
+    function showAllDuties() {
+      document.getElementById('dutyResultTitle').textContent = "全学期值周安排总表";
+      const container = document.getElementById('dutyResultContent');
+      container.innerHTML = '';
+      
+      dutyData.forEach(item => {
+        const el = document.createElement('div');
+        el.className = 'info-item';
+        el.innerHTML = `
+          <div class="info-header">
+            <span class="info-title">第 ${item.week} 周值周安排</span>
+            <span class="info-badge">第${item.week}周</span>
+          </div>
+          <div style="font-size:12px; margin-top:6px; display:grid; grid-template-columns: repeat(2, 1fr); gap:6px;">
+            <div><b>行政值周:</b> ${item.leader}</div>
+            <div><b>值周班级:</b> ${item.cls}</div>
+            <div style="grid-column: span 2;"><b>值周组员:</b> ${item.staff}</div>
+          </div>
+        `;
+        container.appendChild(el);
+      });
+      logConsole("Tauri IPC: 执行 'python3 ch_cli.py duty --all'，拉取全部学期排班总数。", "success");
+    }
+
+    function searchDuty() {
+      const query = document.getElementById('dutySearchInput').value.trim();
+      if (!query) {
+        alert("请输入要检索的教师姓名或班级名称");
+        return;
+      }
+      
+      logConsole(`Tauri API: 执行 'python3 ch_cli.py duty --search ${query}' 检索中...`, 'info');
+      
+      // 模拟超时与偶发网络报错重试机制
+      simulateTimeoutAndRetry(() => {
+        document.getElementById('dutyResultTitle').textContent = `值周搜索结果: "${query}"`;
+        const container = document.getElementById('dutyResultContent');
+        container.innerHTML = '';
+        
+        const filtered = dutyData.filter(item => 
+          item.leader.includes(query) || 
+          item.staff.includes(query) || 
+          item.cls.includes(query)
+        );
+        
+        if (filtered.length === 0) {
+          container.innerHTML = `<div style="text-align:center; padding-block:20px; color:var(--muted); font-size:12px;">未检索到匹配的值周记录</div>`;
+          logConsole(`检索已响应：未找到含有 "${query}" 的值周项`, 'warn');
+        } else {
+          filtered.forEach(item => {
+            const el = document.createElement('div');
+            el.className = 'info-item';
+            el.innerHTML = `
+              <div class="info-header">
+                <span class="info-title">第 ${item.week} 周值周安排</span>
+                <span class="info-badge primary">匹配成功</span>
+              </div>
+              <div style="font-size:12px; margin-top:6px; display:grid; grid-template-columns: repeat(2, 1fr); gap:6px;">
+                <div><b>行政值周:</b> ${item.leader}</div>
+                <div><b>值周班级:</b> ${item.cls}</div>
+                <div style="grid-column: span 2;"><b>值周组员:</b> ${item.staff}</div>
+              </div>
+            `;
+            container.appendChild(el);
+          });
+          logConsole(`值周检索成功！共找到 ${filtered.length} 条记录。`, 'success');
+        }
+      });
+    }
+
+    // 纪律卫生查询
+    function searchHygiene() {
+      const cls = document.getElementById('hygieneClassFilter').value;
+      const container = document.getElementById('hygieneResultList');
+      container.innerHTML = '';
+      
+      const filtered = cls === 'all' ? hygieneRecords : hygieneRecords.filter(r => r.title.includes(cls));
+      
+      filtered.forEach(r => {
+        const el = document.createElement('div');
+        el.className = 'info-item';
+        const isPerfect = r.score.includes("10.0");
+        el.innerHTML = `
+          <div class="info-header">
+            <span class="info-title">${r.title}</span>
+            <span class="info-badge ${isPerfect ? 'success' : 'error'}">${r.score}</span>
+          </div>
+          <div style="font-size:11px; color:var(--muted); margin-bottom:4px;">考评日期: ${r.date} | ID: ${r.id}</div>
+          <div style="font-size:12px; color:var(--fg); line-height:1.4;">${r.detail}</div>
+        `;
+        container.appendChild(el);
+      });
+      logConsole(`Tauri IPC: 执行 'python3 ch_cli.py hygiene'，筛选班级 [${cls}] 考评条目。`, 'success');
+    }
+
+    // 寝室与宿舍考评
+    function queryClassBedrooms() {
+      const grade = document.getElementById('bedGradeSelect').value;
+      const clsNum = document.getElementById('bedClassNum').value;
+      const key = `${grade}-${clsNum}`;
+      
+      const resContainer = document.getElementById('classBedResult');
+      resContainer.innerHTML = '正在拉取班级寝室房间号分配数据...';
+      
+      simulateTimeoutAndRetry(() => {
+        const list = bedroomAllocation[key];
+        if (list) {
+          resContainer.innerHTML = `
+            <div style="font-weight:600; color:var(--accent); margin-bottom:6px;">高${grade === '1' ? '一' : grade === '2' ? '二' : '三'}(${clsNum})班 寝室分配如下：</div>
+            <div style="display:flex; flex-wrap:wrap; gap:8px;">
+              ${list.map(room => `<span style="background:var(--fg-soft); padding:4px 8px; border-radius:4px;">${room}</span>`).join('')}
+            </div>
+            <div style="margin-top:8px; font-size:10px; color:var(--muted);">终端指令: python3 ch_cli.py bedroom class ${grade} ${clsNum}</div>
+          `;
+          logConsole(`寝室检索成功！高${grade}(${clsNum})班拥有寝室数量: ${list.length}`, 'success');
+        } else {
+          resContainer.innerHTML = `
+            <div style="color:var(--error);">未找到该班级寝室分配（高${grade}级 ${clsNum} 班未收录）。</div>
+            <div style="font-size:11px; margin-top:4px;">请尝试输入：高一 12 班 或 高二 3 班。</div>
+          `;
+          logConsole(`检索异常：寝室库不存在该班级索引 ${key}`, 'warn');
+        }
+      });
+    }
+
+    // 宿舍楼宇考评
+    function queryBuildingHygiene() {
+      const building = document.getElementById('buildingSelect').value;
+      const start = document.getElementById('bedStartDate').value;
+      const end = document.getElementById('bedEndDate').value;
+      const showAll = document.getElementById('bedShowAllSwitch').checked;
+      
+      const container = document.getElementById('buildingResultContent');
+      container.innerHTML = '<div style="text-align:center; padding-block:15px; font-size:12px; color:var(--muted);">正在解析楼宇宿舍打分详情...</div>';
+      
+      // 映射现实命名
+      let buildName = "5 号楼 (男寝)";
+      if (building === "1") buildName = "1 号楼 (女寝)";
+      if (building === "9") buildName = "3 号楼";
+      
+      document.getElementById('buildingResultTitle').textContent = `${buildName} 卫生纪律考评表 (${start} 至 ${end})`;
+      
+      simulateTimeoutAndRetry(() => {
+        const dataList = buildingHygieneData[building] || [];
+        container.innerHTML = '';
+        
+        let filtered = showAll ? dataList : dataList.filter(item => !item.score.includes("10分"));
+        
+        if (filtered.length === 0) {
+          container.innerHTML = `<div style="text-align:center; padding-block:15px; color:var(--success); font-size:12px;">✓ 恭喜，该筛选范围内没有任何扣分宿记录！</div>`;
+          logConsole(`楼宇检索：${buildName} 无任何扣分宿舍。`, 'success');
+        } else {
+          filtered.forEach(item => {
+            const isPerfect = item.score.includes("10");
+            const el = document.createElement('div');
+            el.className = 'info-item';
+            el.innerHTML = `
+              <div class="info-header">
+                <span class="info-title" style="font-weight:600;">🚪 ${item.room}</span>
+                <span class="info-badge ${isPerfect ? 'success' : 'error'}">${item.score}</span>
+              </div>
+              <div style="font-size:11px; color:var(--muted);">打分时段: ${item.start} ~ ${item.end}</div>
+              <div style="font-size:12px; margin-top:4px; color:${isPerfect ? 'var(--muted)' : 'var(--error)'};">${item.logs}</div>
+            `;
+            container.appendChild(el);
+          });
+          logConsole(`Tauri IPC: 执行 'python3 ch_cli.py bedroom hygiene ${building} --start ${start} --end ${end} ${showAll ? '--all' : ''}'`, 'success');
+        }
+      });
+    }
+
+    // 失物招领
+    function loadLostFoundList() {
+      const container = document.getElementById('lostFoundList');
+      container.innerHTML = '';
+      
+      lostFoundData.forEach(item => {
+        const el = document.createElement('div');
+        el.className = 'info-item';
+        el.style.cursor = 'pointer';
+        
+        const isLost = item.title.startsWith("丢失");
+        const statusColor = item.status === "寻找中" ? 'var(--warning)' : item.status === '待领' ? 'var(--accent)' : 'var(--success)';
+        
+        el.innerHTML = `
+          <div class="info-header">
+            <span class="info-title" style="font-weight:500;">${item.title}</span>
+            <span class="info-badge" style="color:${statusColor}; background:color-mix(in oklch, ${statusColor} 12%, transparent);">${item.status}</span>
+          </div>
+          <div style="font-size:11px; color:var(--muted); display:flex; justify-content:space-between;">
+            <span>拾获人/丢失人: ${item.finder}</span>
+            <span>登记ID: ${item.id}</span>
+          </div>
+        `;
+        el.onclick = () => {
+          document.getElementById('lfIdInput').value = item.id;
+          showLostFoundDetails(item);
+        };
+        container.appendChild(el);
+      });
+    }
+
+    function showLostFoundDetails(item) {
+      alert(`【失物招领详情 (ID: ${item.id})】\n\n项目：${item.title}\n时间：${item.date}\n发现/丢失地点：${item.place}\n联系信息：${item.contact}\n目前状态：${item.status}`);
+      logConsole(`Tauri API: 检索招领登记详情 [${item.id}] 成功。`, 'success');
+    }
+
+    function queryLostFoundDetails() {
+      const id = document.getElementById('lfIdInput').value.trim().toUpperCase();
+      if (!id) {
+        alert("请输入要检索的登记 ID (例如 LF-402)");
+        return;
+      }
+      
+      const item = lostFoundData.find(d => d.id === id);
+      if (item) {
+        showLostFoundDetails(item);
+      } else {
+        alert(`未找到登记 ID 为 [${id}] 的物品。请核对右侧列表内的登记编码。`);
+        logConsole(`检索异常：失物招领库未找到 ID: ${id}`, 'warn');
+      }
+    }
+
+    // ─── 文件下载与逻辑分片上传寄存 ───────────────────────────────────────
+    function switchArchiveTab(tabId, element) {
+      if (element) {
+        const btns = element.parentNode.querySelectorAll('.tab-btn');
+        btns.forEach(b => b.classList.remove('active'));
+        element.classList.add('active');
+      }
+      
+      const contents = document.querySelectorAll('#panel-archive .tab-content');
+      contents.forEach(c => c.style.display = 'none');
+      document.getElementById(`archive-${tabId}`).style.display = 'block';
+      
+      logConsole(`文件归档：切换至选项页 [${tabId}]`, 'info');
+    }
+
+    function startDownload() {
+      const code = document.getElementById('downloadCode').value.trim();
+      const barContainer = document.getElementById('progressBarContainer');
+      const bar = document.getElementById('progressBar');
+      const status = document.getElementById('downloadStatus');
+      
+      if (!code) {
+        status.textContent = '请输入寄存服务提取密码。';
+        status.style.color = 'var(--error)';
+        return;
+      }
+      
+      barContainer.style.display = 'block';
+      bar.style.width = '0%';
+      status.textContent = '初始化 Tauri IPC 安全连接信道并握手...';
+      status.style.color = 'var(--muted)';
+      logConsole(`提取码下载：发起提取连接验证 [密码: ${code}]`, 'info');
+      
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += 10;
+        bar.style.width = `${progress}%`;
+        status.textContent = `正从校园服务器拉取分片并验证校验和... ${progress}%`;
+        
+        if (progress >= 100) {
+          clearInterval(interval);
+          status.textContent = `✓ 提取成功！已在系统 Downloads 目录中恢复文件 '春晖仰山风光航拍.mp4'。`;
+          status.style.color = 'var(--success)';
+          logConsole(`文件安全下载成功: 春晖仰山风光航拍.mp4`, 'success');
+        }
+      }, 150);
+    }
+    
+    function simulateFileDownload(fileName) {
+      logConsole(`收件箱附件提取：${fileName}`, 'info');
+      alert(`下载成功！文件已存盘至：Downloads/${fileName}`);
+      logConsole(`附件写入物理存盘完成: ${fileName}`, 'success');
+    }
+
+    // 文件寄存逻辑分片上传
+    function triggerFileInput() {
+      document.getElementById('fileInputElement').click();
+    }
+
+    function handleFileSelected(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      startSimulateUpload(file.name, file.size);
+    }
+
+    function startSimulateUpload(fileName, fileSize) {
+      const pSection = document.getElementById('uploadProgressSection');
+      const nameEl = document.getElementById('uploadFileName');
+      const percentEl = document.getElementById('uploadProgressPercent');
+      const bar = document.getElementById('uploadProgressBar');
+      const msg = document.getElementById('uploadStatusMessage');
+      
+      pSection.style.display = 'block';
+      nameEl.textContent = fileName;
+      percentEl.textContent = '0%';
+      bar.style.width = '0%';
+      msg.style.color = 'var(--muted)';
+      msg.textContent = '解析文件，启动 2MB 规格逻辑分片封包引擎...';
+      
+      logConsole(`文件寄存：开始上传文件 [${fileName}]`, 'info');
+      
+      // 分片模拟
+      let totalSize = fileSize || 1024 * 1024 * 7.5; // 缺省 7.5MB
+      const chunkSize = 2 * 1024 * 1024; // 2MB
+      const totalChunks = Math.ceil(totalSize / chunkSize);
+      let currentChunk = 0;
+      
+      logConsole(`切片引擎：拆分为 ${totalChunks} 个逻辑分片 (每分片 2MB规格)`, 'info');
+      
+      const uploadInterval = setInterval(() => {
+        currentChunk++;
+        const percent = Math.min(Math.round((currentChunk / totalChunks) * 100), 100);
+        bar.style.width = `${percent}%`;
+        percentEl.textContent = `${percent}%`;
+        
+        msg.textContent = `正在上传第 ${currentChunk}/${totalChunks} 逻辑分片...`;
+        logConsole(`Tauri IPC: 上传分片 [${currentChunk}/${totalChunks}] - 2MB 状态 ok`, 'info');
+        
+        if (currentChunk >= totalChunks) {
+          clearInterval(uploadInterval);
+          msg.textContent = '所有分片传输完毕！正在请求 Rust 后端进行分片校验与合并...';
+          logConsole('上传校验：分片传输完毕，请求触发服务器端 merge_chunks() API', 'info');
+          
+          setTimeout(() => {
+            const generatedCode = Math.floor(100000 + Math.random() * 900000); // 随机生成6位数密码
+            msg.innerHTML = `<span style="color:var(--success); font-weight:600;">✓ 寄存上传合并成功！提取密码：<b>${generatedCode}</b> (已复制至剪贴板)</span>`;
+            logConsole(`合成分片成功！提取凭证密码: ${generatedCode}`, 'success');
+            
+            // 复制到剪贴板模拟
+            navigator.clipboard.writeText(generatedCode.toString()).catch(() => {});
+            alert(`上传成功！您的文件提取密码为：${generatedCode}，已复制到剪切板。`);
+          }, 1000);
+        }
+      }, 500);
+    }
+
+    // ─── 随机学号抽签 (课堂互动) ───────────────────────────────────────
+    function runLottery() {
+      const btn = document.getElementById('btnStartLottery');
+      const display = document.getElementById('lotteryNumber');
+      const classSize = parseInt(document.getElementById('classSize').value) || 55;
+      
+      if (lotteryInterval) {
+        // 停止抽奖
+        clearInterval(lotteryInterval);
+        lotteryInterval = null;
+        btn.textContent = '开始抽取';
+        
+        // 随机确定一个最终号码
+        const finalNum = Math.floor(Math.random() * classSize) + 1;
+        display.textContent = finalNum.toString().padStart(2, '0');
+        display.style.opacity = '1';
+        logConsole(`课堂点名：成功抽中并锁定学号 [${finalNum}]`, 'success');
+      } else {
+        // 开始抽奖
+        btn.textContent = '锁定';
+        logConsole('启动课堂点名随机滚动签名器...', 'info');
+        
+        lotteryInterval = setInterval(() => {
+          const randNum = Math.floor(Math.random() * classSize) + 1;
+          display.textContent = randNum.toString().padStart(2, '0');
+          // 产生墨水微颤动态效果
+          display.style.opacity = Math.random() > 0.5 ? '0.8' : '1';
+        }, 65);
+      }
+    }
+
+    function resetLottery() {
+      if (lotteryInterval) {
+        clearInterval(lotteryInterval);
+        lotteryInterval = null;
+      }
+      document.getElementById('btnStartLottery').textContent = '开始抽取';
+      document.getElementById('lotteryNumber').textContent = '00';
+      logConsole('课堂点名：抽奖计数复位归零。', 'info');
+    }
+
+    // ─── 真心话大冒险卡牌堆 ───────────────────────────────────────────
+    function resetCardStack() {
+      const container = document.getElementById('cardStack');
+      container.innerHTML = '';
+      currentCards = [...cardTopics].sort(() => Math.random() - 0.5);
+      
+      currentCards.forEach((card, idx) => {
+        const cardEl = document.createElement('div');
+        cardEl.className = 'stack-card';
+        cardEl.style.zIndex = idx + 1;
+        cardEl.style.transform = `translateY(${idx * -6}px) scale(${1 - (currentCards.length - idx) * 0.02}) rotate(${(idx - 3) * 1.5}deg)`;
+        
+        cardEl.innerHTML = `
+          <div class="card-type">${card.type === 'truth' ? '𓃠 真心话' : '𓅪 大冒险'}</div>
+          <div class="card-content">${card.content}</div>
+          <div class="card-tip">${card.tip}</div>
+        `;
+        
+        // 点击卡牌滑走
+        cardEl.addEventListener('click', () => {
+          swipeCard(cardEl, idx);
+        });
+        
+        container.appendChild(cardEl);
+      });
+      logConsole('工具箱：破冰互动真心话大冒险洗牌完毕。', 'success');
+    }
+
+    function swipeCard(cardEl, index) {
+      cardEl.style.transform = `translate(380px, -180px) rotate(40deg)`;
+      cardEl.style.opacity = '0';
+      logConsole(`划走互动卡片: [${currentCards[index].type === 'truth' ? '真心话' : '大冒险'}]`, 'info');
+      
+      setTimeout(() => {
+        cardEl.remove();
+      }, 300);
+    }
+
+    // ─── 壁纸订阅与设置 ──────────────────────────────────────────────
+    function setWallpaper(name) {
+      logConsole(`Tauri win_wallpaper: 调用 Rust 系统级 API 更换壁纸为 [${name}]`, 'info');
+      alert(`已成功将您的桌面壁纸更换为: ${name}`);
+      logConsole(`壁纸应用：win_wallpaper::set_from_path 壁纸应用生效。`, 'success');
+    }
+
+    function toggleSetting(settingName) {
+      const state = document.getElementById(`set${settingName}`).checked;
+      logConsole(`配置同步：更改参数 [${settingName}] = ${state}`, 'info');
+    }
+
+    // ─── Tauri 10 秒超时与 3 次重试自动回滚机制 ───────────────────────────
+    function simulateTimeoutAndRetry(onSuccess) {
+      // 模拟可能出现的异常重试：随机 35% 几率触发重试以展示底层健壮性设计
+      const needRetry = Math.random() < 0.35;
+      
+      if (needRetry) {
+        logConsole('make_request(): 正在尝试向校园服务器建立底层 http 通道...', 'info');
+        setTimeout(() => {
+          logConsole('Tauri IPC 警报：[502 Bad Gateway] 网关超时响应。系统尝试启动 3 次延迟重试机制...', 'warn');
+          setTimeout(() => {
+            logConsole('重试引擎：尝试第 1 次重新建立连接握手...', 'info');
+            logConsole('Tauri IPC 警报：[504 Gateway Timeout] 连接依然受阻。正在回退等待 500ms 进行二次尝试...', 'warn');
+            setTimeout(() => {
+              logConsole('重试引擎：尝试第 2 次重新建立连接握手...', 'info');
+              logConsole('Tauri 网络连通：收到 200 OK 确认数据报。网络在重载后恢复正常。', 'success');
+              onSuccess();
+            }, 600);
+          }, 800);
+        }, 500);
+      } else {
+        // 常规正常调用
+        setTimeout(onSuccess, 300);
+      }
+    }
+
+    // ─── 开发者工具 Console Simulator ────────────────────────────────
+    function toggleConsole() {
+      const panel = document.getElementById('consolePanel');
+      panel.classList.toggle('active');
+    }
+
+    // 调试器输出
+    function logConsole(text, type = 'info') {
+      const logs = document.getElementById('consoleLogs');
+      if (!logs) return;
+      const logLine = document.createElement('div');
+      logLine.className = `console-log ${type}`;
+      logLine.textContent = `[${new Date().toLocaleTimeString()}] ${text}`;
+      logs.appendChild(logLine);
+      logs.scrollTop = logs.scrollHeight;
+    }
+
+    function handleConsoleInput(event) {
+      if (event.key === 'Enter') {
+        const input = document.getElementById('consoleInput');
+        const code = input.value.trim();
+        if (!code) return;
+        
+        logConsole(`> ${code}`, 'info');
+        input.value = '';
+        
+        if (code.toLowerCase() === 'help') {
+          logConsole('支持的底层测试命令:\n  help - 查看支持命令\n  clear - 清理日志屏\n  tauri-info - 打印 Tauri 环境元数据\n  debug-login - 触发一体机会话绑定与解除\n  set-class-size <num> - 修改抽签总人数', 'info');
+        } else if (code.toLowerCase() === 'clear') {
+          document.getElementById('consoleLogs').innerHTML = '';
+        } else if (code.toLowerCase() === 'tauri-info') {
+          logConsole('Tauri Core API: v1.3.0 | Target OS: Windows-x86_64-msvc | Webview2 Engine: Chrome 114.0.0', 'info');
+        } else if (code.toLowerCase().startsWith('set-class-size')) {
+          const num = code.split(' ')[1];
+          if (num && !isNaN(num)) {
+            document.getElementById('classSize').value = num;
+            logConsole(`一体机配置：抽签总人数已被控制台强制重调为: ${num}`, 'success');
+          } else {
+            logConsole('指令错误。用法: set-class-size <数字>', 'error');
+          }
+        } else if (code.toLowerCase() === 'debug-login') {
+          toggleLogin();
+        } else {
+          try {
+            // 安全沙盒化模拟 eval 结果
+            logConsole(`Result: undefined (模拟代码已传输至 Tauri IPC 调度系统)`, 'success');
+          } catch(e) {
+            logConsole(`Error: ${e.message}`, 'error');
+          }
+        }
+      }
+    }
+  </script>
+</body>
+</html>

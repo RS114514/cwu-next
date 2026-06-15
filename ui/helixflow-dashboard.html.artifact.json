@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "HelixFlow 智能工作流画布",
+  "entry": "helixflow-dashboard.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "pdf",
+    "zip"
+  ],
+  "primary": true,
+  "createdAt": "2026-06-14T21:57:07.803Z",
+  "updatedAt": "2026-06-14T21:57:07.814Z",
+  "sourceSkillId": "agent-browser",
+  "designSystemId": "claude",
+  "metadata": {
+    "identifier": "helixflow-dashboard",
+    "artifactType": "text/html",
+    "inferred": false
+  }
+}

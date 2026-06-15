@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "春晖的任意门 - 桌面客户端原型",
+  "entry": "cwu-portal-2.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "pdf",
+    "zip"
+  ],
+  "primary": true,
+  "createdAt": "2026-06-14T21:35:51.444Z",
+  "updatedAt": "2026-06-14T21:35:51.455Z",
+  "sourceSkillId": "agent-browser",
+  "designSystemId": "claude",
+  "metadata": {
+    "identifier": "cwu-portal",
+    "artifactType": "text/html",
+    "inferred": false
+  }
+}

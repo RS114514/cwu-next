@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "春晖新媒体社白马湖之声",
+  "entry": "chunhui-media-homepage.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "pdf",
+    "zip"
+  ],
+  "primary": true,
+  "createdAt": "2026-06-14T22:04:02.809Z",
+  "updatedAt": "2026-06-14T22:04:02.813Z",
+  "sourceSkillId": "agent-browser",
+  "designSystemId": "claude",
+  "metadata": {
+    "identifier": "chunhui-media-homepage",
+    "artifactType": "text/html",
+    "inferred": false
+  }
+}
