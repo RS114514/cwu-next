@@ -1,31 +1,41 @@
 <!doctype html>
 <html lang="zh-CN">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>春晖的任意门 - 桌面客户端原型</title>
+  <title>春戊NEXT - 桌面客户端</title>
   <style>
     /* ─── 核心设计系统 (极简现代编辑感风格) ─────────────────────────────────── */
     :root {
-      --bg:      #FBF9F4;   /* 温暖宣纸色 */
-      --surface: #FFFFFF;   /* 卡片白 */
-      --fg:      #191919;   /* 深焦糖黑 */
-      --muted:   #666561;   /* 暮色灰 */
-      --border:  #E5E2DD;   /* 温暖边框灰 */
-      --accent:  #C27052;   /* 琥珀陶土红 */
+      --bg: #FBF9F4;
+      /* 温暖宣纸色 */
+      --surface: #FFFFFF;
+      /* 卡片白 */
+      --fg: #191919;
+      /* 深焦糖黑 */
+      --muted: #666561;
+      /* 暮色灰 */
+      --border: #E5E2DD;
+      /* 温暖边框灰 */
+      --accent: #C27052;
+      /* 琥珀陶土红 */
 
       /* 状态色 */
-      --success: #4F7A5E;   /* 暮翠绿 */
-      --error:   #A84E39;   /* 砖红 */
-      --warning: #D1913C;   /* 麦田金 */
-      
+      --success: #4F7A5E;
+      /* 暮翠绿 */
+      --error: #A84E39;
+      /* 砖红 */
+      --warning: #D1913C;
+      /* 麦田金 */
+
       --accent-soft: color-mix(in oklch, var(--accent) 10%, transparent);
-      --fg-soft:     color-mix(in oklch, var(--fg) 5%, transparent);
+      --fg-soft: color-mix(in oklch, var(--fg) 5%, transparent);
 
       /* 全衬线字体美学 */
       --font-display: Georgia, 'Lora', 'Playfair Display', '华文中宋', 'STZhongsong', '宋体-简', 'Songti SC', serif;
-      --font-body:    Georgia, 'Lora', 'Playfair Display', '华文中宋', 'STZhongsong', '宋体-简', 'Songti SC', serif;
-      --font-mono:    ui-monospace, 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+      --font-body: Georgia, 'Lora', 'Playfair Display', '华文中宋', 'STZhongsong', '宋体-简', 'Songti SC', serif;
+      --font-mono: ui-monospace, 'JetBrains Mono', 'SF Mono', Menlo, monospace;
 
       /* 统一间距与圆角 */
       --gap-xs: 8px;
@@ -35,23 +45,34 @@
       --gap-xl: 48px;
       --radius: 8px;
       --radius-lg: 12px;
-      
+
       --shadow-sm: 0 1px 3px rgba(25, 25, 25, 0.05);
       --shadow-md: 0 4px 12px rgba(25, 25, 25, 0.04);
     }
 
     /* ─── 深色模式 ─────────────────────────────────────────────────── */
     :root.dark-theme {
-      --bg:      #191816;   /* 深墨色 */
-      --surface: #201E1B;   /* 暗灰卡片 */
-      --fg:      #E8E5DF;   /* 乳白字 */
-      --muted:   #9C9890;   /* 灰褐字 */
-      --border:  #383531;   /* 深褐线 */
-      --accent:  #E08E71;   /* 暖焦糖橙 */
+      --bg: #191816;
+      /* 深墨色 */
+      --surface: #201E1B;
+      /* 暗灰卡片 */
+      --fg: #E8E5DF;
+      /* 乳白字 */
+      --muted: #9C9890;
+      /* 灰褐字 */
+      --border: #383531;
+      /* 深褐线 */
+      --accent: #E08E71;
+      /* 暖焦糖橙 */
     }
 
     /* ─── 基础样式重置 ──────────────────────────────────────────────── */
-    *, *::before, *::after { box-sizing: border-box; }
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
       background: var(--bg);
@@ -59,7 +80,8 @@
       font-family: var(--font-body);
       font-size: 14px;
       line-height: 1.6;
-      letter-spacing: 0.02em; /* 优雅的字间距 */
+      letter-spacing: 0.02em;
+      /* 优雅的字间距 */
       text-rendering: optimizeLegibility;
       -webkit-font-smoothing: antialiased;
       transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
@@ -69,7 +91,7 @@
       align-items: center;
       justify-content: center;
     }
-    
+
     /* 纸质纹理背景 */
     body::before {
       content: "";
@@ -82,8 +104,11 @@
       background-position: 0 0, 4px 4px;
       z-index: 100;
     }
-    
-    button, input, textarea, select {
+
+    button,
+    input,
+    textarea,
+    select {
       font: inherit;
       color: inherit;
       background: none;
@@ -96,7 +121,7 @@
       text-decoration: none;
       transition: color 0.2s ease;
     }
-    
+
     /* ─── 桌面客户端模拟框架 (Windows 11) ──────────────────────────────── */
     .client-frame {
       width: 96vw;
@@ -125,6 +150,7 @@
       user-select: none;
       z-index: 10;
     }
+
     .titlebar .window-title {
       font-size: 12px;
       color: var(--muted);
@@ -133,14 +159,17 @@
       gap: 6px;
       font-family: var(--font-display);
     }
+
     .titlebar .window-title .icon {
       color: var(--accent);
       font-weight: bold;
     }
+
     .titlebar .window-controls {
       display: flex;
       gap: 16px;
     }
+
     .titlebar .ctrl-btn {
       width: 12px;
       height: 12px;
@@ -149,9 +178,18 @@
       transition: background 0.2s;
       cursor: pointer;
     }
-    .titlebar .ctrl-btn.close:hover { background: var(--error); }
-    .titlebar .ctrl-btn.minimize:hover { background: var(--warning); }
-    .titlebar .ctrl-btn.maximize:hover { background: var(--success); }
+
+    .titlebar .ctrl-btn.close:hover {
+      background: var(--error);
+    }
+
+    .titlebar .ctrl-btn.minimize:hover {
+      background: var(--warning);
+    }
+
+    .titlebar .ctrl-btn.maximize:hover {
+      background: var(--success);
+    }
 
     /* ─── 主体布局 ──────────────────────────────────────────────────── */
     .client-body {
@@ -171,29 +209,33 @@
       justify-content: space-between;
       flex-shrink: 0;
     }
+
     .sidebar .logo-area {
       margin-bottom: 24px;
     }
+
     .sidebar .brand-title {
       font-family: var(--font-display);
-      font-size: 20px;
+      font-size: 32px;
       font-weight: 500;
       color: var(--accent);
       letter-spacing: -0.01em;
     }
+
     .sidebar .brand-subtitle {
-      font-size: 11px;
+      font-size: 16px;
       color: var(--muted);
       font-family: var(--font-mono);
       margin-top: 2px;
     }
-    
+
     .nav-list {
       display: flex;
       flex-direction: column;
       gap: 6px;
       margin-bottom: auto;
     }
+
     .nav-item {
       display: flex;
       align-items: center;
@@ -205,15 +247,18 @@
       transition: all 0.2s ease;
       cursor: pointer;
     }
+
     .nav-item:hover {
       background: var(--fg-soft);
       color: var(--fg);
     }
+
     .nav-item.active {
       background: var(--accent-soft);
       color: var(--accent);
       font-weight: 500;
     }
+
     .nav-item .icon {
       font-size: 15px;
       width: 20px;
@@ -227,6 +272,7 @@
       flex-direction: column;
       gap: 8px;
     }
+
     .user-badge {
       display: flex;
       align-items: center;
@@ -238,9 +284,11 @@
       cursor: pointer;
       transition: background 0.2s;
     }
+
     .user-badge:hover {
       background: color-mix(in oklch, var(--fg) 10%, transparent);
     }
+
     .user-badge .avatar {
       width: 24px;
       height: 24px;
@@ -251,21 +299,24 @@
       place-items: center;
       font-weight: bold;
     }
+
     .user-badge .info {
       flex: 1;
       overflow: hidden;
     }
+
     .user-badge .name {
       font-weight: 500;
       white-space: nowrap;
       text-overflow: ellipsis;
       overflow: hidden;
     }
+
     .user-badge .status {
       font-size: 10px;
       color: var(--muted);
     }
-    
+
     .sidebar-btn {
       display: flex;
       align-items: center;
@@ -277,6 +328,7 @@
       cursor: pointer;
       transition: background 0.2s;
     }
+
     .sidebar-btn:hover {
       background: var(--fg-soft);
       color: var(--fg);
@@ -296,19 +348,29 @@
       display: none;
       animation: fadeIn 0.4s ease forwards;
     }
+
     .panel-view.active {
       display: flex;
       flex-direction: column;
     }
+
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     /* ─── 标题和排版 ────────────────────────────────────────────────── */
     header {
       margin-bottom: var(--gap-md);
     }
+
     .page-eyebrow {
       font-family: var(--font-mono);
       font-size: 11px;
@@ -317,13 +379,14 @@
       color: var(--accent);
       margin-bottom: var(--gap-xs);
     }
+
     .page-title {
       font-family: var(--font-display);
       font-size: clamp(24px, 3.5vw, 32px);
       font-weight: normal;
       margin: 0;
     }
-    
+
     /* ─── 卡片样式 ──────────────────────────────────────────────────── */
     .card {
       background: var(--surface);
@@ -333,11 +396,13 @@
       box-shadow: var(--shadow-sm);
       transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
     }
+
     .card.interactive:hover {
       transform: translateY(-2px);
       box-shadow: var(--shadow-md);
       border-color: var(--accent);
     }
+
     .card-title {
       font-family: var(--font-display);
       font-size: 16px;
@@ -351,14 +416,40 @@
     }
 
     /* ─── 网格与布局 ────────────────────────────────────────────────── */
-    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
-    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-    .grid-2-1 { display: grid; grid-template-columns: 1.8fr 1.2fr; gap: 24px; }
-    .grid-1-2 { display: grid; grid-template-columns: 1.2fr 1.8fr; gap: 24px; }
-    @media (max-width: 960px) {
-      .grid-2, .grid-3, .grid-2-1, .grid-1-2 { grid-template-columns: 1fr; }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
     }
-    
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .grid-2-1 {
+      display: grid;
+      grid-template-columns: 1.8fr 1.2fr;
+      gap: 24px;
+    }
+
+    .grid-1-2 {
+      display: grid;
+      grid-template-columns: 1.2fr 1.8fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 960px) {
+
+      .grid-2,
+      .grid-3,
+      .grid-2-1,
+      .grid-1-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
     /* ─── 按钮 ──────────────────────────────────────────────────────── */
     .btn {
       display: inline-flex;
@@ -374,27 +465,32 @@
       border: 1px solid transparent;
       user-select: none;
     }
+
     .btn-primary {
       background: var(--accent);
       color: var(--surface);
     }
+
     .btn-primary:hover {
       background: color-mix(in oklch, var(--accent) 85%, black);
     }
+
     .btn-secondary {
       background: var(--surface);
       border-color: var(--border);
       color: var(--fg);
     }
+
     .btn-secondary:hover {
       border-color: var(--fg);
       background: var(--fg-soft);
     }
+
     .btn-sm {
       padding: 4px 10px;
       font-size: 12px;
     }
-    
+
     /* ─── 输入与表单 ────────────────────────────────────────────────── */
     .form-group {
       display: flex;
@@ -402,17 +498,21 @@
       gap: 6px;
       margin-bottom: 14px;
     }
+
     .form-group label {
       font-size: 12px;
       color: var(--muted);
       font-weight: 500;
     }
+
     .input-wrapper {
       position: relative;
       display: flex;
       align-items: center;
     }
-    .text-input, .select-input {
+
+    .text-input,
+    .select-input {
       width: 100%;
       background: var(--surface);
       border: 1px solid var(--border);
@@ -421,7 +521,9 @@
       font-size: 13px;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
-    .text-input:focus, .select-input:focus {
+
+    .text-input:focus,
+    .select-input:focus {
       border-color: var(--accent);
       box-shadow: 0 0 0 3px var(--accent-soft);
     }
@@ -433,6 +535,7 @@
       margin-block: var(--gap-xs);
       position: relative;
     }
+
     .quote-text {
       font-family: var(--font-display);
       font-size: 16px;
@@ -440,6 +543,7 @@
       line-height: 1.5;
       margin: 0 0 8px 0;
     }
+
     .quote-author {
       font-size: 12px;
       color: var(--muted);
@@ -457,33 +561,41 @@
       transition: background 0.2s;
       cursor: pointer;
     }
+
     .portal-link:last-child {
       border-bottom: none;
     }
+
     .portal-link:hover {
       background: var(--fg-soft);
     }
+
     .portal-link .link-info {
       display: flex;
       align-items: center;
       gap: 12px;
     }
+
     .portal-link .link-icon {
       font-size: 16px;
       color: var(--accent);
     }
+
     .portal-link .link-title {
       font-weight: 500;
     }
+
     .portal-link .link-desc {
       font-size: 11px;
       color: var(--muted);
       margin-top: 2px;
     }
+
     .portal-link .arrow {
       color: var(--border);
       transition: transform 0.2s, color 0.2s;
     }
+
     .portal-link:hover .arrow {
       color: var(--accent);
       transform: translateX(4px);
@@ -496,6 +608,7 @@
       margin-bottom: 20px;
       gap: 16px;
     }
+
     .tab-btn {
       padding: 8px 8px 10px 8px;
       font-size: 13px;
@@ -504,13 +617,16 @@
       cursor: pointer;
       transition: color 0.2s;
     }
+
     .tab-btn:hover {
       color: var(--fg);
     }
+
     .tab-btn.active {
       color: var(--accent);
       font-weight: 500;
     }
+
     .tab-btn.active::after {
       content: "";
       position: absolute;
@@ -531,12 +647,14 @@
       margin-top: 14px;
       display: none;
     }
+
     .progress-bar {
       height: 100%;
       width: 0%;
       background: var(--success);
       transition: width 0.1s linear;
     }
+
     .status-msg {
       font-size: 12px;
       margin-top: 6px;
@@ -550,6 +668,7 @@
       align-items: center;
       gap: 16px;
     }
+
     .luck-card {
       width: 160px;
       height: 190px;
@@ -565,12 +684,14 @@
       background-image: radial-gradient(var(--border) 1px, transparent 0);
       background-size: 12px 12px;
     }
+
     .luck-card .card-label {
       font-size: 11px;
       color: var(--muted);
       position: absolute;
       top: 14px;
     }
+
     .luck-card .card-number {
       font-family: var(--font-display);
       font-size: 68px;
@@ -578,6 +699,7 @@
       font-weight: normal;
       transition: opacity 0.1s ease;
     }
+
     .luck-card .card-decor {
       font-size: 10px;
       color: var(--border);
@@ -592,6 +714,7 @@
       align-items: center;
       justify-content: center;
     }
+
     .stack-card {
       position: absolute;
       width: 310px;
@@ -600,7 +723,7 @@
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
       padding: 20px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.02);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -608,6 +731,7 @@
       transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s, z-index 0.3s;
       transform-origin: center bottom;
     }
+
     .stack-card .card-type {
       font-family: var(--font-mono);
       font-size: 10px;
@@ -615,6 +739,7 @@
       color: var(--accent);
       letter-spacing: 0.1em;
     }
+
     .stack-card .card-content {
       font-family: var(--font-display);
       font-size: 15px;
@@ -622,6 +747,7 @@
       text-align: center;
       margin-block: auto;
     }
+
     .stack-card .card-tip {
       font-size: 10px;
       color: var(--muted);
@@ -636,6 +762,7 @@
       justify-content: center;
       padding-block: var(--gap-lg);
     }
+
     .loading-spinner {
       width: 32px;
       height: 32px;
@@ -645,16 +772,20 @@
       animation: spin 1s linear infinite;
       margin-bottom: 12px;
     }
+
     @keyframes spin {
-      to { transform: rotate(360deg); }
+      to {
+        transform: rotate(360deg);
+      }
     }
-    
+
     .wallpaper-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 16px;
       margin-top: 16px;
     }
+
     .wallpaper-item {
       position: relative;
       aspect-ratio: 16/10;
@@ -663,6 +794,7 @@
       overflow: hidden;
       cursor: pointer;
     }
+
     .wallpaper-item .ph-img {
       width: 100%;
       height: 100%;
@@ -672,25 +804,29 @@
       font-family: var(--font-display);
       font-size: 16px;
       color: #fff;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
       transition: transform 0.3s ease;
     }
+
     .wallpaper-item:hover .ph-img {
       transform: scale(1.05);
     }
+
     .wallpaper-item .item-overlay {
       position: absolute;
       inset: 0;
-      background: linear-gradient(to top, rgba(0,0,0,0.6), transparent 60%);
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent 60%);
       display: flex;
       align-items: flex-end;
       padding: 12px;
       opacity: 0;
       transition: opacity 0.2s;
     }
+
     .wallpaper-item:hover .item-overlay {
       opacity: 1;
     }
+
     .wallpaper-item .item-title {
       color: #fff;
       font-size: 11px;
@@ -709,16 +845,19 @@
       background: var(--fg-soft);
       border: 1px solid var(--border);
     }
+
     .banner-warning {
       background: color-mix(in oklch, var(--warning) 8%, var(--bg));
       border-color: color-mix(in oklch, var(--warning) 30%, var(--border));
       color: color-mix(in oklch, var(--warning) 60%, var(--fg));
     }
+
     .banner-error {
       background: color-mix(in oklch, var(--error) 6%, var(--bg));
       border-color: color-mix(in oklch, var(--error) 25%, var(--border));
       color: color-mix(in oklch, var(--error) 75%, var(--fg));
     }
+
     .banner-success {
       background: color-mix(in oklch, var(--success) 6%, var(--bg));
       border-color: color-mix(in oklch, var(--success) 25%, var(--border));
@@ -733,29 +872,35 @@
       padding-block: 12px;
       border-bottom: 1px solid var(--border);
     }
+
     .setting-row:last-child {
       border-bottom: none;
     }
+
     .setting-info .title {
       font-weight: 500;
       font-size: 13px;
     }
+
     .setting-info .desc {
       font-size: 11px;
       color: var(--muted);
       margin-top: 2px;
     }
+
     .switch {
       position: relative;
       display: inline-block;
       width: 40px;
       height: 22px;
     }
+
     .switch input {
       opacity: 0;
       width: 0;
       height: 0;
     }
+
     .slider {
       position: absolute;
       cursor: pointer;
@@ -764,6 +909,7 @@
       transition: .3s;
       border-radius: 22px;
     }
+
     .slider::before {
       content: "";
       position: absolute;
@@ -775,10 +921,12 @@
       transition: .3s;
       border-radius: 50%;
     }
-    input:checked + .slider {
+
+    input:checked+.slider {
       background-color: var(--accent);
     }
-    input:checked + .slider::before {
+
+    input:checked+.slider::before {
       transform: translateX(18px);
     }
 
@@ -788,6 +936,7 @@
       flex-direction: column;
       gap: 10px;
     }
+
     .info-item {
       padding: 12px;
       border: 1px solid var(--border);
@@ -795,15 +944,18 @@
       background: var(--surface);
       transition: border-color 0.2s;
     }
+
     .info-item:hover {
       border-color: var(--accent);
     }
+
     .info-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 6px;
     }
+
     .info-badge {
       font-family: var(--font-mono);
       font-size: 10px;
@@ -812,27 +964,32 @@
       background: var(--fg-soft);
       color: var(--muted);
     }
+
     .info-badge.primary {
       background: var(--accent-soft);
       color: var(--accent);
     }
+
     .info-badge.success {
       background: color-mix(in oklch, var(--success) 12%, transparent);
       color: var(--success);
     }
+
     .info-badge.error {
       background: color-mix(in oklch, var(--error) 12%, transparent);
       color: var(--error);
     }
+
     .info-title {
       font-weight: 500;
       font-size: 13px;
     }
+
     .info-meta {
       font-size: 11px;
       color: var(--muted);
     }
-    
+
     /* 文件寄存上传区域 */
     .upload-drag-area {
       border: 2px dashed var(--border);
@@ -843,16 +1000,19 @@
       background: color-mix(in oklch, var(--bg) 98%, var(--fg) 2%);
       transition: border-color 0.2s, background 0.2s;
     }
-    .upload-drag-area:hover, .upload-drag-area.dragover {
+
+    .upload-drag-area:hover,
+    .upload-drag-area.dragover {
       border-color: var(--accent);
       background: var(--accent-soft);
     }
+
     .upload-drag-icon {
       font-size: 32px;
       color: var(--accent);
       margin-bottom: 12px;
     }
-    
+
     /* 两栏联动面板样式 */
     .master-detail {
       display: grid;
@@ -861,12 +1021,14 @@
       height: 520px;
       overflow: hidden;
     }
+
     .master-list {
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
       overflow-y: auto;
       background: var(--surface);
     }
+
     .master-item {
       padding: 12px 14px;
       border-bottom: 1px solid var(--border);
@@ -874,16 +1036,20 @@
       transition: background 0.2s, border-left 0.2s;
       border-left: 3px solid transparent;
     }
+
     .master-item:last-child {
       border-bottom: none;
     }
+
     .master-item:hover {
       background: var(--fg-soft);
     }
+
     .master-item.active {
       background: var(--accent-soft);
       border-left-color: var(--accent);
     }
+
     .detail-view {
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
@@ -894,7 +1060,7 @@
       flex-direction: column;
       gap: 16px;
     }
-    
+
     /* ─── 开发者控制台 (Chrome Console Demo) ────────────────────────── */
     .console-panel {
       position: absolute;
@@ -912,9 +1078,11 @@
       font-size: 11px;
       color: #9c9890;
     }
+
     .console-panel.active {
       right: 0;
     }
+
     .console-header {
       background: color-mix(in oklch, var(--bg) 95%, var(--fg) 5%);
       padding: 10px 14px;
@@ -924,6 +1092,7 @@
       justify-content: space-between;
       color: var(--fg);
     }
+
     .console-logs {
       flex: 1;
       padding: 12px;
@@ -933,14 +1102,28 @@
       gap: 6px;
       background: #141311;
     }
+
     .console-log {
       line-height: 1.4;
       white-space: pre-wrap;
     }
-    .console-log.info { color: #88d4e9; }
-    .console-log.success { color: #8cd07e; }
-    .console-log.warn { color: #e5c07b; }
-    .console-log.error { color: #f47e7e; }
+
+    .console-log.info {
+      color: #88d4e9;
+    }
+
+    .console-log.success {
+      color: #8cd07e;
+    }
+
+    .console-log.warn {
+      color: #e5c07b;
+    }
+
+    .console-log.error {
+      color: #f47e7e;
+    }
+
     .console-input-area {
       border-top: 1px solid var(--border);
       padding: 8px 12px;
@@ -949,77 +1132,305 @@
       gap: 6px;
       background: #191816;
     }
+
     .console-prompt {
       color: var(--accent);
       font-weight: bold;
     }
+
     .console-input {
       flex: 1;
       color: #fff;
     }
+
+    /* ─── 快捷中心网格 ────────────────────────────────────────────── */
+    .portal-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 1024px) {
+      .portal-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .portal-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .portal-grid-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px var(--gap-xs);
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 8px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .portal-grid-item::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, var(--accent-soft), transparent);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 1;
+    }
+
+    .portal-grid-item:hover::before {
+      opacity: 1;
+    }
+
+    .portal-grid-item:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent);
+      box-shadow: var(--shadow-md);
+    }
+
+    .portal-grid-item .icon {
+      font-size: 26px;
+      z-index: 2;
+      transition: transform 0.3s ease;
+    }
+
+    .portal-grid-item:hover .icon {
+      transform: scale(1.15) rotate(5deg);
+    }
+
+    .portal-grid-item .title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--fg);
+      z-index: 2;
+    }
+
+    .portal-grid-item .desc {
+      font-size: 10px;
+      color: var(--muted);
+      z-index: 2;
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* ─── 全局弹窗模态框 ───────────────────────────────────────────── */
+    .cwu-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(8px);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      animation: modalFadeIn 0.3s ease;
+    }
+
+    @keyframes modalFadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    .cwu-modal-content {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      width: 90%;
+      max-width: 700px;
+      padding: 24px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+      position: relative;
+      animation: modalScaleUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes modalScaleUp {
+      from {
+        transform: scale(0.95) translateY(15px);
+      }
+
+      to {
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .cwu-modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      font-size: 20px;
+      cursor: pointer;
+      color: var(--muted);
+      transition: color 0.2s;
+    }
+
+    .cwu-modal-close:hover {
+      color: var(--accent);
+    }
+
+    /* 视频和直播播放器模拟 */
+    .video-player-sim {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: #0d0c0b;
+      border-radius: var(--radius);
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+    }
+
+    .video-placeholder-bg {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, #1c1916 0%, #2e2a24 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      z-index: 1;
+    }
+
+    .play-btn-sim {
+      width: 64px;
+      height: 64px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+      transition: transform 0.2s, background-color 0.2s;
+    }
+
+    .play-btn-sim:hover {
+      transform: scale(1.1);
+      background: color-mix(in oklch, var(--accent) 85%, black);
+    }
+
+    /* 弹幕流模拟 */
+    .danmaku-container {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+      overflow: hidden;
+    }
+
+    .danmaku-item {
+      position: absolute;
+      white-space: nowrap;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 500;
+      text-shadow: 1px 1px 3px #000;
+      animation: danmakuMove 8s linear forwards;
+    }
+
+    @keyframes danmakuMove {
+      from {
+        left: 100%;
+      }
+
+      to {
+        left: -100%;
+      }
+    }
   </style>
 </head>
+
 <body>
 
   <!-- Windows 11 客户端应用框 -->
   <div class="client-frame">
-    
+
     <!-- 标题栏 -->
     <div class="titlebar">
       <div class="window-title">
         <span class="icon">𓇚</span>
-        <span>春晖的任意门 · Dokodemo Door (v1.3.0-RC)</span>
+        <span>春戊NEXT (v1.3.0-RC)</span>
       </div>
       <div class="window-controls">
         <div class="ctrl-btn minimize"></div>
         <div class="ctrl-btn maximize"></div>
-        <div class="ctrl-btn close" onclick="alert('春晖的任意门：已最小化至系统托盘，保持后台静默运行')"></div>
+        <div class="ctrl-btn close" onclick="alert('春戊NEXT：已最小化至系统托盘，保持后台静默运行')"></div>
       </div>
     </div>
-    
+
     <!-- 应用实体 -->
     <div class="client-body">
-      
+
       <!-- 左侧边栏 -->
       <aside class="sidebar">
         <div>
           <div class="logo-area">
-            <div class="brand-title">春晖任意门</div>
-            <div class="brand-subtitle">Dokodemo Door</div>
+            <div class="brand-title">春戊NEXT</div>
+            <div class="brand-subtitle">Chunwu NEXT</div>
           </div>
-          
+
           <nav class="nav-list">
-            <div class="nav-item active" onclick="switchPanel('dashboard', this)">
+            <div class="nav-item active" data-panel="dashboard" onclick="switchPanel('dashboard', this)">
               <span class="icon">𓇚</span>
               <span>首页简报</span>
             </div>
-            <div class="nav-item" onclick="switchPanel('news', this)">
-              <span class="icon">𓅃</span>
-              <span>校园资讯</span>
+            <div class="nav-item" data-panel="announcements" onclick="switchPanel('announcements', this)">
+              <span class="icon">📢</span>
+              <span>校园公告</span>
             </div>
-            <div class="nav-item" onclick="switchPanel('queries', this)">
+            <div class="nav-item" data-panel="weather" onclick="switchPanel('weather', this)">
+              <span class="icon">🌤</span>
+              <span>实时天气</span>
+            </div>
+            <div class="nav-item" data-panel="queries" onclick="switchPanel('queries', this)">
               <span class="icon">🔍</span>
               <span>校园查询</span>
             </div>
-            <div class="nav-item" onclick="switchPanel('archive', this)">
+            <div class="nav-item" data-panel="archive" onclick="switchPanel('archive', this)">
               <span class="icon">𓅪</span>
               <span>文件寄存</span>
             </div>
-            <div class="nav-item" onclick="switchPanel('toolbox', this)">
+            <div class="nav-item" data-panel="toolbox" onclick="switchPanel('toolbox', this)">
               <span class="icon">𓃠</span>
               <span>班级工具</span>
             </div>
-            <div class="nav-item" onclick="switchPanel('wallpaper', this)">
+            <div class="nav-item" data-panel="wallpaper" onclick="switchPanel('wallpaper', this)">
               <span class="icon">𓆭</span>
               <span>壁纸订阅</span>
             </div>
-            <div class="nav-item" onclick="switchPanel('settings', this)">
+            <div class="nav-item" data-panel="settings" onclick="switchPanel('settings', this)">
               <span class="icon">⚙</span>
               <span>设置选项</span>
             </div>
           </nav>
         </div>
-        
+
         <div class="sidebar-footer">
           <!-- 登录状态 -->
           <div class="user-badge" id="userBadge" onclick="toggleLogin()">
@@ -1029,31 +1440,31 @@
               <div class="status" id="userStatus">点击登录绑定班级</div>
             </div>
           </div>
-          
+
           <!-- 深色模式 -->
           <div class="sidebar-btn" onclick="toggleTheme()">
             <span class="theme-icon">🌘</span>
             <span class="theme-text">深色模式</span>
           </div>
-          
+
           <!-- 关于我们 -->
-          <div class="sidebar-btn" onclick="alert('春晖的任意门\n\n新媒体社口播搭档工作室荣誉出品\n白马湖畔的青春守护工具。')">
+          <div class="sidebar-btn" onclick="alert('春戊NEXT\n\n新媒体社口播搭档工作室荣誉出品\n白马湖畔的青春守护工具。')">
             <span>𓇚</span>
             <span>关于我们</span>
           </div>
         </div>
       </aside>
-      
+
       <!-- 右侧主视口 -->
       <main class="viewport" id="viewport">
-        
+
         <!-- 1. 首页简报面板 -->
         <div class="panel-view active" id="panel-dashboard">
           <header>
             <div class="page-eyebrow" id="cal-date">六月十五日 星期一 · 夏</div>
-            <h1 class="page-title" id="greeting-title">下午好，梓浩。</h1>
+            <h1 class="page-title" id="greeting-title">下午好！</h1>
           </header>
-          
+
           <div class="grid-2-1">
             <!-- 左侧核心卡片 -->
             <div class="stack" style="display:flex; flex-direction:column; gap:20px;">
@@ -1067,74 +1478,95 @@
                   <button class="btn btn-secondary btn-sm" onclick="changeQuote()">换一句</button>
                 </div>
               </div>
-              
+
+              <!-- 核心快捷入口 -->
+              <div class="card">
+                <div class="card-title">🚀 核心快捷入口</div>
+                <div class="portal-grid">
+                  <!-- 站内短信 -->
+                  <div class="portal-grid-item" onclick="switchPanel('archive'); switchArchiveTab('message')">
+                    <span class="icon">✉️</span>
+                    <span class="title">站内短信</span>
+                    <span class="desc">快速跳转至校园内部消息或通知</span>
+                  </div>
+                  <!-- 云上春晖 -->
+                  <div class="portal-grid-item" onclick="switchPanel('archive'); switchArchiveTab('code')">
+                    <span class="icon">☁️</span>
+                    <span class="title">云上春晖</span>
+                    <span class="desc">连接校园云服务与网盘平台</span>
+                  </div>
+                  <!-- 春晖图库 -->
+                  <div class="portal-grid-item" onclick="switchPanel('wallpaper')">
+                    <span class="icon">🖼️</span>
+                    <span class="title">春晖图库</span>
+                    <span class="desc">展示校园活动照片及精选素材</span>
+                  </div>
+                  <!-- 春晖视频 -->
+                  <div class="portal-grid-item" onclick="playCampusVideo()">
+                    <span class="icon">📺</span>
+                    <span class="title">春晖视频</span>
+                    <span class="desc">校园电视台及公开课录像流媒体</span>
+                  </div>
+                  <!-- 春晖直播 -->
+                  <div class="portal-grid-item" onclick="openLiveStream()">
+                    <span class="icon">🔴</span>
+                    <span class="title">春晖直播</span>
+                    <span class="desc">大型活动与课程的实时直播</span>
+                  </div>
+                </div>
+              </div>
+
               <!-- 今日值周快捷高亮栏 -->
               <div class="card">
                 <div class="card-title">
                   <span>📅 今日值周简报</span>
-                  <span class="info-badge primary" onclick="switchPanel('queries', document.querySelectorAll('.nav-item')[2]); switchQueryTab('duty')" style="cursor:pointer;">查看完整表 ↗</span>
+                  <span class="info-badge primary" onclick="switchPanel('queries'); switchQueryTab('duty')"
+                    style="cursor:pointer;">查看完整表 ↗</span>
                 </div>
                 <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; font-size:12px;">
-                  <div style="background:var(--fg-soft); padding:10px; border-radius: var(--radius); text-align:center;">
+                  <div
+                    style="background:var(--fg-soft); padding:10px; border-radius: var(--radius); text-align:center;">
                     <div style="color:var(--muted); margin-bottom:4px;">行政值周</div>
                     <div style="font-weight:500; font-size:14px; color:var(--accent);" id="dashDutyLeader">陈老师</div>
                   </div>
-                  <div style="background:var(--fg-soft); padding:10px; border-radius: var(--radius); text-align:center;">
+                  <div
+                    style="background:var(--fg-soft); padding:10px; border-radius: var(--radius); text-align:center;">
                     <div style="color:var(--muted); margin-bottom:4px;">值周组员</div>
                     <div style="font-weight:500; font-size:14px;" id="dashDutyStaff">张老师、王老师</div>
                   </div>
-                  <div style="background:var(--accent-soft); padding:10px; border-radius: var(--radius); text-align:center;">
+                  <div
+                    style="background:var(--accent-soft); padding:10px; border-radius: var(--radius); text-align:center;">
                     <div style="color:var(--accent); margin-bottom:4px;">值周班级</div>
                     <div style="font-weight:600; font-size:14px; color:var(--accent);" id="dashDutyClass">高一(12)班</div>
                   </div>
                 </div>
               </div>
-              
-              <!-- 快捷入口 -->
-              <div class="card" style="padding:0; overflow:hidden;">
-                <div class="portal-link" onclick="switchPanel('archive', document.querySelectorAll('.nav-item')[3]); switchArchiveTab('upload')">
-                  <div class="link-info">
-                    <span class="link-icon">☁</span>
-                    <div>
-                      <div class="link-title">逻辑分片寄存</div>
-                      <div class="link-desc">以 2MB 规格逻辑分片上传，自动获取 6 位数提取密码</div>
-                    </div>
-                  </div>
-                  <span class="arrow">→</span>
-                </div>
-                <div class="portal-link" onclick="alert('春晖图库：今日已同步仰山摄影社、白马湖晚霞精选素材 12 张，可在壁纸面板订阅。')">
-                  <div class="link-info">
-                    <span class="link-icon">🖼</span>
-                    <div>
-                      <div class="link-title">春晖图库</div>
-                      <div class="link-desc">白马湖经典风光地标与精选学生活动影集</div>
-                    </div>
-                  </div>
-                  <span class="arrow">→</span>
-                </div>
-              </div>
             </div>
-            
+
             <!-- 右侧历法和天气 -->
             <div class="stack" style="display:flex; flex-direction:column; gap:20px;">
               <div class="card" style="text-align: center;">
-                <div style="font-family: var(--font-mono); font-size: 36px; font-weight: normal; color: var(--accent);" id="digital-clock">05:19:55</div>
-                <div style="font-size: 12px; color: var(--muted); margin-top: 6px;">上虞白马湖畔 · 校园多媒体一体机端</div>
-                
-                <div style="border-top:1px solid var(--border); margin-block:12px; padding-top:12px; text-align: left; font-size: 12px; color:var(--muted); display:flex; flex-direction:column; gap:6px;">
+                <div style="font-family: var(--font-mono); font-size: 36px; font-weight: normal; color: var(--accent);"
+                  id="digital-clock">05:19:55</div>
+                <div style="font-size: 12px; color: var(--muted); margin-top: 6px;">上虞白马湖畔 · 春晖中学</div>
+
+                <div
+                  style="border-top:1px solid var(--border); margin-block:12px; padding-top:12px; text-align: left; font-size: 12px; color:var(--muted); display:flex; flex-direction:column; gap:6px;">
                   <div>农历：丙午年五月初一</div>
                   <div>节气：夏至后三日 · 蝉始鸣</div>
                   <div>天气：晴 26℃ ~ 32℃ · 东南风</div>
                 </div>
               </div>
-              
-              <!-- 系统公告 -->
+
+              <!-- 校园公告 -->
               <div class="card">
                 <div class="card-title">
-                  <span>系统公告</span>
-                  <a href="#" style="font-size:11px; color:var(--accent);" onclick="alert('一体机系统手册：如网络异常，本程序将启动 10s 超时防护与 3 次延迟重试。')">说明</a>
+                  <span>校园公告</span>
+                  <a href="#" style="font-size:11px; color:var(--accent);"
+                    onclick="alert('一体机系统手册：如网络异常，本程序将启动 10s 超时防护与 3 次延迟重试。')">说明</a>
                 </div>
-                <div id="announcement-area" style="font-size:12px; line-height:1.5; color: var(--muted); min-height:60px;">
+                <div id="announcement-area"
+                  style="font-size:12px; line-height:1.5; color: var(--muted); min-height:60px;">
                   <div style="border-bottom: 1px solid var(--border); padding-bottom:8px; margin-bottom:8px;">
                     <span style="color:var(--accent); font-weight:500;">[公示]</span> 仰山校园网将于本周六凌晨2点维护。
                   </div>
@@ -1142,44 +1574,205 @@
                     <span style="color:var(--success); font-weight:500;">[提示]</span> 本学期卫生宿舍楼宇考核编码映射已更新。
                   </div>
                 </div>
-                <button class="btn btn-secondary" style="width:100%; font-size:11px; padding:6px 0; margin-top:8px;" onclick="readAllAnnouncements()">全部设为已读</button>
+                <button class="btn btn-secondary" style="width:100%; font-size:11px; padding:6px 0; margin-top:8px;"
+                  onclick="readAllAnnouncements()">全部设为已读</button>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- 2. 校园资讯面板 -->
-        <div class="panel-view" id="panel-news">
+        <!-- ─── 校园公告面板 ──────────────────────────────────────────────── -->
+        <div class="panel-view" id="panel-announcements">
           <header>
-            <div class="page-eyebrow">News & Bulletin</div>
-            <h1 class="page-title">校园资讯与公告</h1>
+            <div class="page-eyebrow">Announcements Hub</div>
+            <h1 class="page-title">校园公告中心</h1>
           </header>
-          
+
           <div class="master-detail">
-            <!-- 左侧新闻栏目/文章列表 -->
-            <div class="master-list" id="newsMasterList">
-              <div style="padding:12px; border-bottom:1px solid var(--border); display:flex; gap:8px;">
-                <select class="select-input" style="padding:6px 8px; font-size:12px;" id="newsColumnSelect" onchange="loadNewsList()">
-                  <option value="19">19 - 校内公示</option>
-                  <option value="13">13 - 新闻聚焦</option>
-                  <option value="51">51 - 值周小结</option>
-                </select>
+            <!-- 左侧公告列表 -->
+            <div class="master-list">
+              <div
+                style="padding:14px 12px; border-bottom:1px solid var(--border); font-weight:600; font-size:12px; color:var(--accent); font-family:var(--font-mono); text-transform:uppercase; letter-spacing:0.05em;">
+                📌 LATEST ANNOUNCEMENTS
               </div>
-              <div id="newsItemsContainer">
+              <div id="announcementsListContainer">
                 <!-- 由 JS 渲染 -->
               </div>
             </div>
-            
-            <!-- 右侧正文及详情 -->
-            <div class="detail-view" id="newsDetailView">
-              <!-- 初始提示 -->
-              <div style="margin:auto; text-align:center; color:var(--muted);">
-                <span style="font-size:24px;">📄</span>
-                <div style="font-size:13px; margin-top:12px;">请从左侧列表选择一篇文章进行查阅</div>
+
+            <!-- 右侧详情与发布 -->
+            <div class="detail-view"
+              style="display:flex; flex-direction:column; gap:16px; height:520px; overflow-y:auto;">
+              <div id="announcementDetailArea" style="flex:1;">
+                <!-- 初始提示 -->
+                <div style="margin:auto; text-align:center; color:var(--muted); padding-top:40px;">
+                  <span style="font-size:32px;">📢</span>
+                  <div style="font-size:13px; margin-top:12px;">请从左侧列表选择一条公告进行查阅</div>
+                </div>
+              </div>
+
+              <!-- 发布模拟器 -->
+              <div class="card" style="margin-top:auto; background:var(--bg); border-style:dashed; padding: 14px;">
+                <div style="font-size:13px; font-weight:600; margin-bottom:8px; color:var(--accent);">✍️ 发布班级公告 (模拟)
+                </div>
+                <div class="form-group" style="margin-bottom:8px;">
+                  <input type="text" class="text-input" placeholder="输入公告标题..." id="newAnnTitle"
+                    style="padding:6px 10px; font-size:12px;" />
+                </div>
+                <div class="form-group" style="margin-bottom:8px;">
+                  <textarea class="text-input" placeholder="输入公告详情内容..." id="newAnnContent"
+                    style="padding:6px 10px; font-size:12px; min-height:50px; font-family:inherit; resize:vertical;"></textarea>
+                </div>
+                <div style="display:flex; justify-content:space-between; gap:10px; align-items:center;">
+                  <select class="select-input" id="newAnnType"
+                    style="padding:4px 8px; font-size:11px; width:120px; height:28px;">
+                    <option value="class">班级通知</option>
+                    <option value="emergency">紧急通知</option>
+                    <option value="school">校园公示</option>
+                  </select>
+                  <button class="btn btn-primary btn-sm" onclick="publishSimulatedAnnouncement()">发布公告</button>
+                </div>
               </div>
             </div>
           </div>
         </div>
+
+        <!-- ─── 实时天气面板 ──────────────────────────────────────────────── -->
+        <div class="panel-view" id="panel-weather">
+          <header>
+            <div class="page-eyebrow">Weather Station</div>
+            <h1 class="page-title">实时天气与出行指数</h1>
+          </header>
+
+          <div class="stack" style="display:flex; flex-direction:column; gap:20px;">
+            <!-- 上方天气主看板 -->
+            <div class="card"
+              style="background: linear-gradient(135deg, var(--accent-soft) 0%, var(--surface) 100%); display:flex; justify-content:space-between; align-items:center; padding:32px 40px; border-color:var(--accent);">
+              <div>
+                <div style="font-size:14px; color:var(--accent); font-weight:600; font-family:var(--font-mono);">上虞白马湖畔
+                  · 校园多媒体一体机</div>
+                <div style="display:flex; align-items:baseline; gap:12px; margin-top:8px;">
+                  <span
+                    style="font-size:56px; font-family:var(--font-display); line-height:1; color:var(--fg);">28℃</span>
+                  <span style="font-size:20px; color:var(--fg); font-weight:500;">晴朗 🌤</span>
+                </div>
+                <div style="font-size:12px; color:var(--muted); margin-top:10px; display:flex; gap:16px;">
+                  <span>🧭 东南风 2 级</span>
+                  <span>💧 湿度 65%</span>
+                  <span>🍃 空气质量 优 (32)</span>
+                </div>
+              </div>
+              <div style="font-size:72px; animation: pulse 3s infinite;">🌤</div>
+            </div>
+
+            <!-- 下方折线图与出行指数 -->
+            <div class="grid-2-1">
+              <!-- 左侧多日温度趋势 (使用 SVG 渲染) -->
+              <div class="card">
+                <div class="card-title">📅 白马湖畔 5 日温度走势</div>
+                <div style="position:relative; width:100%; height:200px; margin-top:10px;">
+                  <svg viewBox="0 0 500 180" style="width:100%; height:100%; overflow:visible;">
+                    <!-- 网格水平线 -->
+                    <line x1="30" y1="30" x2="470" y2="30" stroke="var(--border)" stroke-dasharray="4,4" />
+                    <line x1="30" y1="90" x2="470" y2="90" stroke="var(--border)" stroke-dasharray="4,4" />
+                    <line x1="30" y1="150" x2="470" y2="150" stroke="var(--border)" stroke-dasharray="4,4" />
+
+                    <!-- 高温曲线 -->
+                    <path d="M 50,40 Q 150,20 250,50 T 450,45" fill="none" stroke="var(--accent)" stroke-width="3" />
+                    <!-- 高温数据点 -->
+                    <circle cx="50" cy="40" r="4" fill="var(--accent)" />
+                    <circle cx="150" cy="27" r="4" fill="var(--accent)" />
+                    <circle cx="250" cy="50" r="4" fill="var(--accent)" />
+                    <circle cx="350" cy="42" r="4" fill="var(--accent)" />
+                    <circle cx="450" cy="45" r="4" fill="var(--accent)" />
+
+                    <!-- 高温文本 -->
+                    <text x="50" y="24" font-size="10" font-family="var(--font-mono)" fill="var(--accent)"
+                      text-anchor="middle">32℃</text>
+                    <text x="150" y="12" font-size="10" font-family="var(--font-mono)" fill="var(--accent)"
+                      text-anchor="middle">34℃</text>
+                    <text x="250" y="36" font-size="10" font-family="var(--font-mono)" fill="var(--accent)"
+                      text-anchor="middle">30℃</text>
+                    <text x="350" y="28" font-size="10" font-family="var(--font-mono)" fill="var(--accent)"
+                      text-anchor="middle">31℃</text>
+                    <text x="450" y="31" font-size="10" font-family="var(--font-mono)" fill="var(--accent)"
+                      text-anchor="middle">31℃</text>
+
+                    <!-- 低温曲线 -->
+                    <path d="M 50,110 Q 150,90 250,120 T 450,115" fill="none" stroke="var(--success)"
+                      stroke-width="3" />
+                    <!-- 低温数据点 -->
+                    <circle cx="50" cy="110" r="4" fill="var(--success)" />
+                    <circle cx="150" cy="98" r="4" fill="var(--success)" />
+                    <circle cx="250" cy="120" r="4" fill="var(--success)" />
+                    <circle cx="350" cy="112" r="4" fill="var(--success)" />
+                    <circle cx="450" cy="115" r="4" fill="var(--success)" />
+
+                    <!-- 低温文本 -->
+                    <text x="50" y="130" font-size="10" font-family="var(--font-mono)" fill="var(--success)"
+                      text-anchor="middle">24℃</text>
+                    <text x="150" y="118" font-size="10" font-family="var(--font-mono)" fill="var(--success)"
+                      text-anchor="middle">25℃</text>
+                    <text x="250" y="140" font-size="10" font-family="var(--font-mono)" fill="var(--success)"
+                      text-anchor="middle">22℃</text>
+                    <text x="350" y="132" font-size="10" font-family="var(--font-mono)" fill="var(--success)"
+                      text-anchor="middle">23℃</text>
+                    <text x="450" y="135" font-size="10" font-family="var(--font-mono)" fill="var(--success)"
+                      text-anchor="middle">23℃</text>
+
+                    <!-- 日期底轴 -->
+                    <text x="50" y="170" font-size="11" fill="var(--muted)" text-anchor="middle">周一(今日)</text>
+                    <text x="150" y="170" font-size="11" fill="var(--muted)" text-anchor="middle">周二</text>
+                    <text x="250" y="170" font-size="11" fill="var(--muted)" text-anchor="middle">周三</text>
+                    <text x="350" y="170" font-size="11" fill="var(--muted)" text-anchor="middle">周四</text>
+                    <text x="450" y="170" font-size="11" fill="var(--muted)" text-anchor="middle">周五</text>
+                  </svg>
+                </div>
+              </div>
+
+              <!-- 右侧班级出行气象指数 -->
+              <div class="card" style="display:flex; flex-direction:column; gap:16px;">
+                <div class="card-title">🏃‍♂️ 户外出行气象指数</div>
+                <div style="display:flex; flex-direction:column; gap:12px; font-size:12px;">
+                  <div
+                    style="background:var(--fg-soft); padding:10px; border-radius:var(--radius); display:flex; align-items:center; gap:10px;">
+                    <span style="font-size:20px;">🏃‍♂️</span>
+                    <div>
+                      <div style="font-weight:600;">大课间跑操：推荐 🏃‍♂️</div>
+                      <div style="color:var(--muted); font-size:10px; margin-top:2px;">今天晴朗，微风，气温适中，推荐开展跑操运动。</div>
+                    </div>
+                  </div>
+                  <div
+                    style="background:var(--fg-soft); padding:10px; border-radius:var(--radius); display:flex; align-items:center; gap:10px;">
+                    <span style="font-size:20px;">👕</span>
+                    <div>
+                      <div style="font-weight:600;">班服着装：夏装班服 👕</div>
+                      <div style="color:var(--muted); font-size:10px; margin-top:2px;">白天气温较高，建议着夏季校服或透气短袖。</div>
+                    </div>
+                  </div>
+                  <div
+                    style="background:var(--fg-soft); padding:10px; border-radius:var(--radius); display:flex; align-items:center; gap:10px;">
+                    <span style="font-size:20px;">🕶️</span>
+                    <div>
+                      <div style="font-weight:600;">紫外线强度：强 🕶️</div>
+                      <div style="color:var(--muted); font-size:10px; margin-top:2px;">午后紫外线较强，大课间在室外注意适当避阳。</div>
+                    </div>
+                  </div>
+                  <div
+                    style="background:var(--fg-soft); padding:10px; border-radius:var(--radius); display:flex; align-items:center; gap:10px;">
+                    <span style="font-size:20px;">🏀</span>
+                    <div>
+                      <div style="font-weight:600;">户外运动建议：推荐 🏀</div>
+                      <div style="color:var(--muted); font-size:10px; margin-top:2px;">天气非常适合进行足球、篮球等户外社团项目。</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
 
         <!-- 3. 校园查询面板 -->
         <div class="panel-view" id="panel-queries">
@@ -1187,7 +1780,7 @@
             <div class="page-eyebrow">School Database</div>
             <h1 class="page-title">校园考评与值周查询</h1>
           </header>
-          
+
           <div class="tab-header">
             <span class="tab-btn active" onclick="switchQueryTab('duty', this)">值周排班 (`duty`)</span>
             <span class="tab-btn" onclick="switchQueryTab('hygiene', this)">纪律卫生 (`hygiene`)</span>
@@ -1213,7 +1806,7 @@
                 </div>
                 <button class="btn btn-secondary btn-sm" style="width:100%;" onclick="showAllDuties()">列出整学期总表</button>
               </div>
-              
+
               <!-- 右侧结果展示 -->
               <div class="card" style="min-height:300px; max-height:450px; overflow-y:auto;">
                 <div class="card-title">
@@ -1244,7 +1837,7 @@
                 </div>
                 <button class="btn btn-primary btn-sm" onclick="searchHygiene()">查询考评记录</button>
               </div>
-              
+
               <!-- 右侧展示 -->
               <div class="card" style="min-height:300px; max-height:450px; overflow-y:auto;">
                 <div class="card-title">考评得分与扣分项明细</div>
@@ -1275,8 +1868,10 @@
                     <input type="number" class="text-input" value="12" min="1" max="24" id="bedClassNum" />
                   </div>
                 </div>
-                <button class="btn btn-primary btn-sm" style="width:100%; margin-top:10px;" onclick="queryClassBedrooms()">查询所属寝室分配</button>
-                <div id="classBedResult" style="margin-top:16px; font-size:12px; color:var(--muted); line-height:1.6;"></div>
+                <button class="btn btn-primary btn-sm" style="width:100%; margin-top:10px;"
+                  onclick="queryClassBedrooms()">查询所属寝室分配</button>
+                <div id="classBedResult" style="margin-top:16px; font-size:12px; color:var(--muted); line-height:1.6;">
+                </div>
               </div>
 
               <!-- 2. 宿舍楼宇考评 -->
@@ -1293,11 +1888,13 @@
                 <div class="grid-2">
                   <div class="form-group">
                     <label>起始日期</label>
-                    <input type="date" class="text-input" style="padding:6px 10px;" id="bedStartDate" value="2026-06-01" />
+                    <input type="date" class="text-input" style="padding:6px 10px;" id="bedStartDate"
+                      value="2026-06-01" />
                   </div>
                   <div class="form-group">
                     <label>结束日期</label>
-                    <input type="date" class="text-input" style="padding:6px 10px;" id="bedEndDate" value="2026-06-15" />
+                    <input type="date" class="text-input" style="padding:6px 10px;" id="bedEndDate"
+                      value="2026-06-15" />
                   </div>
                 </div>
                 <div class="setting-row" style="padding-block:6px; border:none;">
@@ -1309,10 +1906,11 @@
                     <span class="slider"></span>
                   </label>
                 </div>
-                <button class="btn btn-primary btn-sm" style="width:100%;" onclick="queryBuildingHygiene()">检索楼宇考评明细</button>
+                <button class="btn btn-primary btn-sm" style="width:100%;"
+                  onclick="queryBuildingHygiene()">检索楼宇考评明细</button>
               </div>
             </div>
-            
+
             <!-- 楼宇考评展示区 -->
             <div class="card" style="margin-top:20px; min-height:150px; max-height:250px; overflow-y:auto;">
               <div class="card-title" id="buildingResultTitle">宿舍楼宇考核结果</div>
@@ -1338,7 +1936,7 @@
                   支持别名 `lf` 查询。登记ID可在右侧列表中查看。
                 </div>
               </div>
-              
+
               <div class="card" style="min-height:300px; max-height:450px; overflow-y:auto;">
                 <div class="card-title">最新登记物品列表</div>
                 <div id="lostFoundList" class="info-list">
@@ -1356,39 +1954,41 @@
             <div class="page-eyebrow">The Archive</div>
             <h1 class="page-title">归档与文件提取</h1>
           </header>
-          
+
           <div class="tab-header">
             <span class="tab-btn active" onclick="switchArchiveTab('code', this)">提取码下载</span>
             <span class="tab-btn" onclick="switchArchiveTab('upload', this)">逻辑分片寄存</span>
             <span class="tab-btn" onclick="switchArchiveTab('message', this)">收件箱邮件附件</span>
           </div>
-          
+
           <div class="card">
             <!-- 提取码 Tab -->
             <div class="tab-content" id="archive-code">
               <p style="font-size:13px; color:var(--muted); margin-top:0; margin-bottom:20px;">
                 在下方输入由本客户端或 CLI 工具生成的 6 位数文件提取密码，高速提取并归档课堂教学资料。
               </p>
-              
+
               <div class="download-section">
                 <div class="input-wrapper" style="max-width: 480px; margin-inline: auto;">
                   <input type="text" class="text-input" placeholder="输入 6 位数字提取密码 (例如: 849301)" id="downloadCode" />
-                  <button class="btn btn-primary" style="position: absolute; right: 4px; padding: 8px 14px;" onclick="startDownload()">安全提取</button>
+                  <button class="btn btn-primary" style="position: absolute; right: 4px; padding: 8px 14px;"
+                    onclick="startDownload()">安全提取</button>
                 </div>
-                
-                <div class="progress-bar-container" id="progressBarContainer" style="max-width: 480px; margin-inline: auto;">
+
+                <div class="progress-bar-container" id="progressBarContainer"
+                  style="max-width: 480px; margin-inline: auto;">
                   <div class="progress-bar" id="progressBar"></div>
                 </div>
                 <div class="status-msg" id="downloadStatus"></div>
               </div>
             </div>
-            
+
             <!-- 文件寄存分片上传 Tab -->
             <div class="tab-content" id="archive-upload" style="display:none;">
               <p style="font-size:13px; color:var(--muted); margin-top:0; margin-bottom:16px;">
                 拖拽文件至下方进行分片上传。系统将对文件进行 2MB 规格逻辑分片，独立包装后自动上传并触发服务器端文件合成。
               </p>
-              
+
               <div style="max-width:540px; margin-inline:auto;">
                 <div class="upload-drag-area" id="uploadDragArea" onclick="triggerFileInput()">
                   <div class="upload-drag-icon">☁</div>
@@ -1396,7 +1996,7 @@
                   <div style="font-size:11px; color:var(--muted);">支持任何格式，大文件将自动切分为 2MB 数据分片上传</div>
                   <input type="file" id="fileInputElement" style="display:none;" onchange="handleFileSelected(event)" />
                 </div>
-                
+
                 <!-- 上传进度控制 -->
                 <div id="uploadProgressSection" style="display:none; margin-top:20px;">
                   <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:6px;">
@@ -1404,13 +2004,14 @@
                     <span id="uploadProgressPercent" style="color:var(--accent); font-weight:600;">0%</span>
                   </div>
                   <div class="progress-bar-container" id="uploadProgressContainer" style="display:block;">
-                    <div class="progress-bar" id="uploadProgressBar" style="width: 0%; background: var(--accent);"></div>
+                    <div class="progress-bar" id="uploadProgressBar" style="width: 0%; background: var(--accent);">
+                    </div>
                   </div>
                   <div class="status-msg" id="uploadStatusMessage" style="text-align:center; margin-top:8px;"></div>
                 </div>
               </div>
             </div>
-            
+
             <!-- 站内短信 Tab -->
             <div class="tab-content" id="archive-message" style="display:none;">
               <!-- 错误提示 -->
@@ -1421,12 +2022,12 @@
                   查询收件箱邮件前，请点击左侧边栏底部的登录按钮。账号密码通常贴在教室多媒体一体机屏幕边框上。
                 </div>
               </div>
-              
+
               <div id="messageFileList" style="display:none;">
                 <p style="font-size:13px; color:var(--muted); margin-top:0; margin-bottom:16px;">
                   自动解析已绑定的收件箱消息中的附件。点击直接获取，免去浏览器“右键另存为”操作。
                 </p>
-                
+
                 <div style="border:1px solid var(--border); border-radius: var(--radius); overflow:hidden;">
                   <div class="portal-link" style="padding-block:12px;">
                     <div class="link-info">
@@ -1436,7 +2037,8 @@
                         <div style="font-size:11px; color:var(--muted);">来自: 新媒体社社长 · 大小: 1.2 MB</div>
                       </div>
                     </div>
-                    <button class="btn btn-secondary btn-sm" onclick="simulateFileDownload('高一(12)班口播搭档招新手册.docx')">下载</button>
+                    <button class="btn btn-secondary btn-sm"
+                      onclick="simulateFileDownload('高一(12)班口播搭档招新手册.docx')">下载</button>
                   </div>
                   <div class="portal-link" style="padding-block:12px;">
                     <div class="link-info">
@@ -1446,12 +2048,13 @@
                         <div style="font-size:11px; color:var(--muted);">来自: 团支书 · 大小: 84 KB</div>
                       </div>
                     </div>
-                    <button class="btn btn-secondary btn-sm" onclick="simulateFileDownload('第六周白马湖团日活动策划.xlsx')">下载</button>
+                    <button class="btn btn-secondary btn-sm"
+                      onclick="simulateFileDownload('第六周白马湖团日活动策划.xlsx')">下载</button>
                   </div>
                 </div>
               </div>
             </div>
-            
+
           </div>
         </div>
 
@@ -1461,12 +2064,12 @@
             <div class="page-eyebrow">The Toolkit</div>
             <h1 class="page-title">班级互动工具箱</h1>
           </header>
-          
+
           <div class="tab-header">
             <span class="tab-btn active" onclick="switchToolTab('lottery', this)">学号随机抽签</span>
             <span class="tab-btn" onclick="switchToolTab('truth', this)">真心话大冒险</span>
           </div>
-          
+
           <!-- 随机抽奖 Tab -->
           <div class="tab-content" id="tool-lottery">
             <div class="grid-2-1">
@@ -1476,20 +2079,21 @@
                   <div class="card-number" id="lotteryNumber">00</div>
                   <div class="card-decor">春晖中学白马湖畔</div>
                 </div>
-                
+
                 <div style="display:flex; gap:12px;">
                   <button class="btn btn-primary" id="btnStartLottery" onclick="runLottery()">开始抽取</button>
                   <button class="btn btn-secondary" onclick="resetLottery()">复位</button>
                 </div>
               </div>
-              
+
               <div class="card" style="display:flex; flex-direction:column; gap:16px;">
                 <h3 style="font-size: 15px; font-weight:600; margin:0;">课堂点名配置</h3>
                 <div class="setting-row" style="padding-block:8px;">
                   <div class="setting-info">
                     <div class="title" style="font-size:13px;">班级总人数</div>
                   </div>
-                  <input type="number" class="text-input" style="width: 80px; padding: 6px;" value="55" min="1" max="100" id="classSize" />
+                  <input type="number" class="text-input" style="width: 80px; padding: 6px;" value="55" min="1"
+                    max="100" id="classSize" />
                 </div>
                 <div class="setting-row" style="padding-block:8px; border:none;">
                   <div class="setting-info">
@@ -1506,17 +2110,17 @@
               </div>
             </div>
           </div>
-          
+
           <!-- 真心话大冒险 Tab -->
           <div class="tab-content" id="tool-truth" style="display:none;">
             <p style="font-size:13px; color:var(--muted); margin-top:0; margin-bottom:20px; text-align:center;">
               点击最上面的卡牌即可将其划走，抽取全新的真心话大冒险题目，适用于班会或新媒体破冰。
             </p>
-            
+
             <div class="card-stack-container" id="cardStack">
               <!-- 卡牌由 JS 动态渲染 -->
             </div>
-            
+
             <div style="text-align: center; margin-top: 16px;">
               <button class="btn btn-secondary" onclick="resetCardStack()">重置卡牌堆</button>
             </div>
@@ -1529,7 +2133,7 @@
             <div class="page-eyebrow">Wallpaper</div>
             <h1 class="page-title">白马湖每日壁纸订阅</h1>
           </header>
-          
+
           <!-- 加载中 -->
           <div class="card" id="wallpaperLoading" style="display: block;">
             <div class="loading-container">
@@ -1537,7 +2141,7 @@
               <div style="font-size: 13px; color: var(--muted);">正在从白马湖摄影社数据库拉取今日壁纸推荐...</div>
             </div>
           </div>
-          
+
           <!-- 壁纸画廊 -->
           <div class="stack" id="wallpaperGallery" style="display: none; gap: 20px;">
             <div class="banner banner-warning" style="margin-bottom:0;">
@@ -1546,7 +2150,7 @@
                 已成功订阅“春晖校园风光”频道。本程序将每天 06:00 自动将最新壁纸同步为您的 Windows/macOS 桌面背景。
               </div>
             </div>
-            
+
             <div class="wallpaper-grid">
               <div class="wallpaper-item" onclick="setWallpaper('仰山山麓.jpg')">
                 <div class="ph-img" style="background: linear-gradient(135deg, #c96442, #e8e5df);">仰山山麓</div>
@@ -1567,7 +2171,7 @@
                 </div>
               </div>
             </div>
-            
+
             <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
               <span style="font-size:12px; color:var(--muted);">数据源: 春晖中学新媒体社摄影资源库 (每日更新)</span>
               <button class="btn btn-primary" onclick="alert('壁纸成功下载！已平滑更换您的桌面壁纸。')">
@@ -1583,7 +2187,7 @@
             <div class="page-eyebrow">Settings</div>
             <h1 class="page-title">客户端系统设置</h1>
           </header>
-          
+
           <div class="stack" style="display:flex; flex-direction:column; gap:20px;">
             <!-- 基础设置 -->
             <div class="card">
@@ -1598,7 +2202,7 @@
                   <span class="slider"></span>
                 </label>
               </div>
-              
+
               <div class="setting-row">
                 <div class="setting-info">
                   <div class="title">全屏教学自适应静默</div>
@@ -1610,7 +2214,7 @@
                 </label>
               </div>
             </div>
-            
+
             <!-- 功能设置 -->
             <div class="card">
               <h3 style="font-size: 14px; font-weight:600; margin-bottom: 8px;">壁纸与订阅</h3>
@@ -1625,7 +2229,7 @@
                 </label>
               </div>
             </div>
-            
+
             <!-- 调试与开发设置 -->
             <div class="card">
               <h3 style="font-size: 14px; font-weight:600; margin-bottom: 8px; color: var(--accent);">开发与调试设置</h3>
@@ -1641,12 +2245,13 @@
         </div>
 
       </main>
-      
+
       <!-- Built-in DevTools Console Simulator -->
       <div class="console-panel" id="consolePanel">
         <div class="console-header">
           <span>Tauri Web Inspector</span>
-          <button style="color:var(--error); font-weight:bold; background:none; cursor:pointer;" onclick="toggleConsole()">✕</button>
+          <button style="color:var(--error); font-weight:bold; background:none; cursor:pointer;"
+            onclick="toggleConsole()">✕</button>
         </div>
         <div class="console-logs" id="consoleLogs">
           <div class="console-log info">[Tauri] Loading core packages...</div>
@@ -1656,10 +2261,66 @@
         </div>
         <div class="console-input-area">
           <span class="console-prompt">&gt;</span>
-          <input type="text" class="console-input" id="consoleInput" placeholder="输入 help 获得支持" onkeydown="handleConsoleInput(event)" />
+          <input type="text" class="console-input" id="consoleInput" placeholder="输入 help 获得支持"
+            onkeydown="handleConsoleInput(event)" />
         </div>
       </div>
-      
+
+    </div>
+  </div>
+
+  <!-- ─── 春晖视频/直播弹窗 ────────────────────────────────────────── -->
+  <!-- 春晖视频模态框 -->
+  <div id="cwu-video-modal" class="cwu-modal" onclick="closeModal('cwu-video-modal')">
+    <div class="cwu-modal-content" onclick="event.stopPropagation()">
+      <span class="cwu-modal-close" onclick="closeModal('cwu-video-modal')">✕</span>
+      <h2
+        style="margin-top:0; font-family:var(--font-display); font-weight:normal; margin-bottom:16px; color:var(--fg);">
+        📹 春晖视频 - 校园电视台/公开课</h2>
+      <div class="video-player-sim">
+        <div class="video-placeholder-bg" id="video-placeholder">
+          <div class="play-btn-sim" onclick="startSimulatedVideo()">▶</div>
+          <div style="font-size:14px; font-weight:500; margin-top:8px;">点击播放：《仰山学术研讨会开幕致辞与校园宣传片》</div>
+          <div style="font-size:11px; color:var(--muted);">时长: 12:40 | 发布者: 新媒体社</div>
+        </div>
+        <div id="simulated-video-screen"
+          style="width:100%; height:100%; display:none; background:#1c1916; align-items:center; justify-content:center; flex-direction:column;">
+          <div style="font-size:32px; animation: spin 2s linear infinite;">⏳</div>
+          <div style="margin-top:12px; font-size:13px; color:#a8a29e;">正在从校园多媒体 CDN 高速缓冲流媒体...</div>
+        </div>
+      </div>
+      <div style="margin-top:16px; font-size:12px; color:var(--muted); line-height:1.5;">
+        <b>今日热播：</b>《白马湖畔的青春守护 - 任意门介绍视频》、《防溺水安全警示片》、《社团招新先导片》。
+      </div>
+    </div>
+  </div>
+
+  <!-- 春晖直播模态框 -->
+  <div id="cwu-live-modal" class="cwu-modal" onclick="closeModal('cwu-live-modal')">
+    <div class="cwu-modal-content" onclick="event.stopPropagation()">
+      <span class="cwu-modal-close" onclick="closeModal('cwu-live-modal')">✕</span>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h2 style="margin:0; font-family:var(--font-display); font-weight:normal; color:var(--fg);">🔴 春晖直播 - 实时校园电视台
+        </h2>
+        <span class="info-badge error"
+          style="background:var(--error); color:#fff; border:none; padding:4px 8px; font-weight:bold; font-size:11px; border-radius:4px;">●
+          LIVE</span>
+      </div>
+      <div class="video-player-sim">
+        <div class="danmaku-container" id="live-danmaku-container"></div>
+        <div class="video-placeholder-bg" style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);">
+          <div style="font-size:48px;">🎥</div>
+          <div style="font-size:16px; font-weight:600; margin-top:8px;">第32届社团联合招新宣讲大会直播间</div>
+          <div style="font-size:12px; color:#94a3b8; margin-top:4px;">当前在线人数: 1,248 人 | 累计获赞: <span
+              id="live-like-count">5.8k</span></div>
+        </div>
+      </div>
+      <div style="margin-top:16px; display:flex; justify-content:space-between; align-items:center;">
+        <div style="font-size:12px; color:var(--muted);">
+          直播源: 仰山报告厅主会场机位
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="likeLiveStream()">👍 给直播点赞</button>
+      </div>
     </div>
   </div>
 
@@ -1676,7 +2337,7 @@
       { text: "“对人性的剖析常常让我们羞愧，但唯有真诚的相待，才能在这个冷漠時代融化冰雪。”", author: "拉罗什富科" }
     ];
     let quoteIndex = 0;
-    
+
     // 真心话大冒险题目数据
     let cardTopics = [
       { type: "truth", content: "向你的口播搭档说一句这学期你一直想说但没说出口的感谢。", tip: "真心话 · 点击将其划走" },
@@ -1689,20 +2350,7 @@
     let currentCards = [];
 
     // ─── 校园资讯及公告模拟数据 ───────────────────────────────────────
-    let newsData = {
-      "19": [
-        { id: "1901", title: "关于做好第六周白马湖防溺水安全宣传的通知", date: "2026-06-12", author: "政教处", content: `<h3>各班级、各社团：</h3><p>夏季临近，防溺水安全教育刻不容缓。请各班主任在周一班会课期间利用本“多媒体一体机”播放安全防范警示视频，并组织全体学生认真阅读《春晖中学防溺水告家长书》。</p><p>相关防溺水讲座及课件已经通过文件寄存系统上传，班委会及团支部可凭提取码 <b>1208</b> 快速在“文件提取”面板进行极速下载，并在班内分发学习。</p><p>特此通知。</p>`, attachments: ["防溺水安全班会课件.pptx", "防溺水回执单.pdf"] },
-        { id: "1902", title: "白马湖多媒体教学一体机会话校验更新机制", date: "2026-06-10", author: "信息中心", content: `<p>为配合白马湖智慧校园网络升级，教学班级多媒体一体机终端现已启用新版 Cookie 校验机制。登录后会话将保留在本地，后续可直接免验证码访问校园资源。</p><p>如果系统异常，底层的 <b>chunhui-cil</b> 会自动在后台启动 10s 请求防护及 3 次超时重试。控制台会产生详细日志。</p>`, attachments: [] },
-        { id: "1903", title: "关于仰山学术报告厅周末学术研讨会场地预约的公示", date: "2026-06-08", author: "校办", content: `<p>本周末（6月17日-6月18日）仰山报告厅将承办全省高中语文教学研讨会。届时报告厅场地暂不对社团或班级预约开放，已提交申请的社团将被协调至实验楼多功能厅进行。</p><p>请相关社团负责人及时登录校园网系统确认协调方案。</p>`, attachments: ["研讨会日程表.docx"] }
-      ],
-      "13": [
-        { id: "1301", title: "春晖中学第32届社团联合招新大会火热开启", date: "2026-06-14", author: "团委 / 新媒体社", content: `<p>白马湖畔，群英荟萃！春晖中学第32届社团招新将于本周五下午在仰山广场拉开帷幕。从古风悠扬的国学社，到现代感十足的机器人俱乐部，更有新媒体社携手口播搭档工作室进行现场直播招新宣讲。</p><p>加入我们，用文字记录青春，用镜头框住白马湖的四季风光！</p>`, attachments: ["社团招新大表.xlsx"] },
-        { id: "1302", title: "我校在“白马湖杯”中学生创意摄影大赛中再创佳绩", date: "2026-06-11", author: "白马湖摄影社", content: `<p>在刚刚落幕的第十届“白马湖杯”摄影大奖赛中，我校摄影社成员提交的作品《仰山山麓的绿荫》和《白马湖畔的温柔晚霞》荣获一等奖。这些作品已经由新媒体社同步录入到客户端壁纸推荐列表中，同学们可以在“壁纸订阅”面板中一键将其设为本地桌面背景，每日轮播换新。</p>`, attachments: ["获奖作品原图大礼包.zip"] }
-      ],
-      "51": [
-        { id: "5101", title: "第五周行政值周总结与整改意见通报", date: "2026-06-09", author: "校值周组", content: `<p>上周（第五周）行政值周总体情况良好。绝大多数班级在早自修及卫生清扫环节表现优异。但在纪律考核方面仍存在个别问题：</p><p><b>重点整改：</b>部分男寝（尤其是5号楼3楼区域）在内务检查中被扣分，主要表现在鞋子摆放不整齐及垃圾未倾倒。请高一各班级宿管委员加强督导，寝室考评详情可通过“寝室考评”进行按楼宇和班级房号的一键导出与查询。</p>`, attachments: ["第五周扣分寝室一览.xlsx"] }
-      ]
-    };
+
 
     // ─── 校园查询模拟数据 ───────────────────────────────────────────
     let dutyData = [
@@ -1752,12 +2400,134 @@
       { id: "LF-403", title: "捡到：仰山食堂二楼一卡通卡片", finder: "高二(3)班 李同学", date: "2026-06-12", place: "仰山食堂二楼餐盘回收处", contact: "已交至一卡通服务中心", status: "已领" }
     ];
 
+    let announcementsData = [
+      { id: "A-01", title: "关于做好第六周白马湖防溺水安全宣传的通知", date: "2026-06-12", author: "政教处", type: "school", content: `<h3>各班级、各社团：</h3><p>夏季临近，防溺水安全教育刻不容缓。请各班主任在周一班会课期间利用本“多媒体一体机”播放安全防范警示视频，并组织全体学生认真阅读《春晖中学防溺水告家长书》。</p><p>相关防溺水讲座及课件已经通过文件寄存系统上传，班委会及团支部可凭提取码 <b>1208</b> 快速在“文件提取”面板进行极速下载，并在班内分发学习。</p><p>特此通知。</p>`, isRead: false },
+      { id: "A-02", title: "春晖中学第32届社团联合招新大会火热开启", date: "2026-06-14", author: "团委 / 新媒体社", type: "class", content: `<p>白马湖畔，群英荟萃！春晖中学第32届社团招新将于本周五下午在仰山广场拉开帷幕。从古风悠扬的国学社，到现代感十足的机器人俱乐部，更有新媒体社携手口播搭档工作室进行现场直播招新宣讲。</p><p>加入我们，用镜头框住白马湖的四季风光！</p>`, isRead: false },
+      { id: "A-03", title: "我校在“白马湖杯”中学生创意摄影大赛中再创佳绩", date: "2026-06-11", author: "白马湖摄影社", type: "school", content: `<p>在刚刚落幕的第十届“白马湖杯”摄影大奖赛中，我校摄影社成员提交的作品《仰山山麓的绿荫》和《白马湖畔的温柔晚霞》荣获一等奖。同学们可以在“壁纸订阅”面板中一键将其设为本地桌面背景，每日轮播换新。</p>`, isRead: true },
+      { id: "A-04", title: "第五周行政值周总结与整改意见通报", date: "2026-06-09", author: "校值周组", type: "emergency", content: `<p>上周（第五周）行政值周总体情况良好。绝大多数班级在早自修及卫生清扫环节表现优异。但在纪律考核方面仍存在个别问题：部分男寝在内务检查中被扣分，主要表现在鞋子摆放不整齐及垃圾未倾倒。</p>`, isRead: true },
+      { id: "A-05", title: "仰山校园网将于本周六凌晨2点进行核心网络升级维护", date: "2026-06-15", author: "信息中心", type: "emergency", content: "<p>为提高智慧校园网速，仰山学术报告厅及各班一体机网络将于周六凌晨2:00-4:00进行升级改造。届时有线及无线网络会发生短时中断。</p><p>请大家知悉并合理安排用网时间。</p>", isRead: false },
+      { id: "A-06", title: "关于仰山学术报告厅周末学术研讨会场地预约的公示", date: "2026-06-08", author: "校办", type: "school", content: "<p>本周末（6月17日-6月18日）仰山报告厅将承办全省高中语文教学研讨会。届时报告厅场地暂不对社团或班级预约开放，已提交申请的社团将被协调至实验楼多功能厅进行。</p>", isRead: true }
+    ];
+
+    function loadAnnouncementsList() {
+      filterAnnouncements();
+    }
+
+    function filterAnnouncements() {
+      const container = document.getElementById('announcementsListContainer');
+      if (!container) return;
+      container.innerHTML = '';
+
+      announcementsData.forEach((ann, idx) => {
+        const item = document.createElement('div');
+        item.className = 'master-item';
+        item.style.position = 'relative';
+
+        let typeBadge = '';
+        if (ann.type === 'emergency') typeBadge = '<span style="color:var(--error); margin-right:4px;">[🚨紧急]</span>';
+        else if (ann.type === 'class') typeBadge = '<span style="color:var(--accent); margin-right:4px;">[🏫班级]</span>';
+        else typeBadge = '<span style="color:var(--success); margin-right:4px;">[📢公示]</span>';
+
+        const dotMarkup = !ann.isRead ? '<span style="position:absolute; top:14px; right:14px; width:6px; height:6px; background:var(--error); border-radius:50%;"></span>' : '';
+
+        item.innerHTML = `
+          <div style="font-weight: 500; font-size:13px; margin-bottom:4px; padding-right:12px; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">
+            ${typeBadge}${ann.title}
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--muted);">
+            <span>${ann.author}</span>
+            <span>${ann.date}</span>
+          </div>
+          ${dotMarkup}
+        `;
+
+        item.onclick = () => {
+          document.querySelectorAll('#announcementsListContainer .master-item').forEach(m => m.classList.remove('active'));
+          item.classList.add('active');
+          ann.isRead = true;
+          // 重新载入以去掉红点
+          filterAnnouncements();
+          // 选中这一项
+          const items = document.querySelectorAll('#announcementsListContainer .master-item');
+          if (items[idx]) items[idx].classList.add('active');
+          showAnnouncementDetails(ann);
+        };
+
+        container.appendChild(item);
+      });
+
+      // 默认加载第一条
+      if (announcementsData.length > 0) {
+        showAnnouncementDetails(announcementsData[0]);
+        const firstItem = document.querySelector('#announcementsListContainer .master-item');
+        if (firstItem) firstItem.classList.add('active');
+      } else {
+        document.getElementById('announcementDetailArea').innerHTML = `
+          <div style="margin:auto; text-align:center; color:var(--muted); padding-top:40px;">暂无公告</div>
+        `;
+      }
+    }
+
+    function showAnnouncementDetails(ann) {
+      const area = document.getElementById('announcementDetailArea');
+      if (!area) return;
+      area.innerHTML = `
+        <div style="border-bottom:1px solid var(--border); padding-bottom:12px; margin-bottom:14px;">
+          <h2 style="font-family:var(--font-display); font-size:18px; font-weight:normal; margin:0 0 8px 0; line-height:1.4; color:var(--fg);">${ann.title}</h2>
+          <div style="font-size:11px; color:var(--muted); display:flex; gap:16px;">
+            <span>发布人员: ${ann.author}</span>
+            <span>时间: ${ann.date}</span>
+            <span>类型: ${ann.type === 'emergency' ? '紧急通知' : ann.type === 'class' ? '班级通知' : '校园公示'}</span>
+          </div>
+        </div>
+        <div style="font-size:13px; line-height:1.7; color:var(--fg); min-height:120px;">
+          ${ann.content}
+        </div>
+        <div style="margin-top:20px; text-align:right; border-top:1px solid var(--border); padding-top:12px; font-size:11px; color:var(--muted);">
+          春戊NEXT 智慧多媒体一体机签发并存档
+        </div>
+      `;
+      logConsole(`Tauri API: 获取并查阅公告详情 [${ann.id}]`, 'info');
+    }
+
+    function publishSimulatedAnnouncement() {
+      const title = document.getElementById('newAnnTitle').value.trim();
+      const content = document.getElementById('newAnnContent').value.trim();
+      const type = document.getElementById('newAnnType').value;
+
+      if (!title || !content) {
+        alert("请完整填写公告标题和详细内容");
+        return;
+      }
+
+      const newAnn = {
+        id: "A-" + (announcementsData.length + 1).toString().padStart(2, '0'),
+        title: title,
+        date: new Date().toISOString().split('T')[0],
+        author: "班委会 (一体机端)",
+        type: type,
+        content: `<p>${content.replace(/\n/g, '</p><p>')}</p>`,
+        isRead: true
+      };
+
+      announcementsData.unshift(newAnn);
+      logConsole(`公告模拟发布：成功发布公告 [ID: ${newAnn.id}, 标题: ${title}]`, 'success');
+
+      // 清空输入框
+      document.getElementById('newAnnTitle').value = '';
+      document.getElementById('newAnnContent').value = '';
+
+      filterAnnouncements();
+
+      alert("模拟发布成功！已在左侧公告栏中置顶显示。");
+    }
+
     // ─── 初始化 ──────────────────────────────────────────────────────
     window.addEventListener('load', () => {
       // 启动时钟
       setInterval(updateClock, 1000);
       updateClock();
-      
+
       // 模拟壁纸加载
       setTimeout(() => {
         document.getElementById('wallpaperLoading').style.display = 'none';
@@ -1766,13 +2536,13 @@
       }, 1200);
 
       // 初始化各版块数据
-      loadNewsList();
       showCurrentWeekDuty();
       searchHygiene();
       loadLostFoundList();
       resetCardStack();
-      
-      logConsole('春晖的任意门 Web-Prototype 成功挂载。', 'info');
+      loadAnnouncementsList();
+
+      logConsole('春戊NEXT 客户端原型挂载成功。', 'info');
       logConsole('Tauri IPC 机制就绪。10s 请求保护与 3 次重试重连已绑定后台。', 'success');
     });
 
@@ -1781,7 +2551,7 @@
       // 隐藏所有面板
       const panels = document.querySelectorAll('.panel-view');
       panels.forEach(p => p.classList.remove('active'));
-      
+
       // 显示目标面板
       const targetPanel = document.getElementById(`panel-${panelId}`);
       if (targetPanel) {
@@ -1791,9 +2561,116 @@
       // 更新侧边栏导航高亮
       const navItems = document.querySelectorAll('.nav-item');
       navItems.forEach(item => item.classList.remove('active'));
-      element.classList.add('active');
-      
+
+      let targetNavItem = element;
+      if (!targetNavItem) {
+        targetNavItem = document.querySelector(`.nav-item[data-panel="${panelId}"]`);
+      }
+      if (targetNavItem) {
+        targetNavItem.classList.add('active');
+      }
+
       logConsole(`Tauri 路由：切换至视图面板 [${panelId}]`, 'info');
+    }
+
+    // ─── 校园视频与直播模拟 ──────────────────────────────────────────────
+    let liveDanmakuInterval = null;
+    let liveLikes = 5824;
+
+    function playCampusVideo() {
+      const modal = document.getElementById('cwu-video-modal');
+      modal.style.display = 'flex';
+      // 复位播放画面
+      document.getElementById('video-placeholder').style.display = 'flex';
+      document.getElementById('simulated-video-screen').style.display = 'none';
+      logConsole('春晖视频：打开校园视频点播播放器。', 'info');
+    }
+
+    function startSimulatedVideo() {
+      document.getElementById('video-placeholder').style.display = 'none';
+      document.getElementById('simulated-video-screen').style.display = 'flex';
+      logConsole('春晖视频：开始模拟拉取高清视频流，加载中...', 'info');
+      setTimeout(() => {
+        const screen = document.getElementById('simulated-video-screen');
+        screen.innerHTML = `
+          <div style="font-size:48px; margin-bottom:12px;">🎬</div>
+          <div style="font-size:15px; font-weight:600; color:#fff;">正在播放：《仰山学术研讨会开幕致辞与校园宣传片》</div>
+          <div style="font-size:12px; color:#a8a29e; margin-top:6px;">校园网极速通道缓冲完成 (1080P 60FPS)</div>
+          <div style="margin-top:16px; display:flex; gap:10px;">
+            <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); alert('已暂停模拟播放')">⏸ 暂停</button>
+            <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); document.getElementById('cwu-video-modal').style.display='none'">✕ 关闭</button>
+          </div>
+        `;
+        logConsole('春晖视频：缓冲完成，正在解码播放。', 'success');
+      }, 1500);
+    }
+
+    function openLiveStream() {
+      const modal = document.getElementById('cwu-live-modal');
+      modal.style.display = 'flex';
+      logConsole('春晖直播：成功进入校园直播间。', 'info');
+
+      // 启动弹幕模拟器
+      startLiveDanmaku();
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).style.display = 'none';
+      if (modalId === 'cwu-live-modal') {
+        stopLiveDanmaku();
+      }
+      logConsole(`客户端弹窗：关闭模态框 [${modalId}]`, 'info');
+    }
+
+    function likeLiveStream() {
+      liveLikes++;
+      document.getElementById('live-like-count').textContent = (liveLikes / 1000).toFixed(1) + 'k';
+      logConsole(`春晖直播：点赞成功，当前总点赞数 ${liveLikes}`, 'success');
+
+      // 飘出一个点赞提示弹幕
+      createSingleDanmaku('👍 班级一体机点赞了直播！');
+    }
+
+    function startLiveDanmaku() {
+      if (liveDanmakuInterval) clearInterval(liveDanmakuInterval);
+      const texts = [
+        "仰山报告厅的主视角好清晰啊！",
+        "高一(12)班点赞了直播！",
+        "社团招新大赞！",
+        "求播下新媒体社的镜头！",
+        "今年社团招新好热闹，白马湖畔围满了人",
+        "画面流畅度拉满，赞一个",
+        "春戊NEXT这个一体机端真好用",
+        "给口播搭档投币！",
+        "防溺水宣传片几点播放？",
+        "高二前来围观！"
+      ];
+      liveDanmakuInterval = setInterval(() => {
+        const randomText = texts[Math.floor(Math.random() * texts.length)];
+        createSingleDanmaku(randomText);
+      }, 1800);
+    }
+
+    function stopLiveDanmaku() {
+      if (liveDanmakuInterval) {
+        clearInterval(liveDanmakuInterval);
+        liveDanmakuInterval = null;
+      }
+      const container = document.getElementById('live-danmaku-container');
+      if (container) container.innerHTML = '';
+    }
+
+    function createSingleDanmaku(text) {
+      const container = document.getElementById('live-danmaku-container');
+      if (!container) return;
+      const el = document.createElement('div');
+      el.className = 'danmaku-item';
+      el.textContent = text;
+      el.style.top = Math.floor(Math.random() * 60 + 10) + '%';
+      container.appendChild(el);
+      setTimeout(() => {
+        el.remove();
+      }, 8000);
     }
 
     // ─── 电子时钟与日历 ───────────────────────────────────────────────
@@ -1804,6 +2681,24 @@
       let m = now.getMinutes().toString().padStart(2, '0');
       let s = now.getSeconds().toString().padStart(2, '0');
       clockEl.textContent = `${h}:${m}:${s}`;
+      updateGreeting();
+    }
+
+    function updateGreeting() {
+      const greetingEl = document.getElementById('greeting-title');
+      if (!greetingEl) return;
+      const hours = new Date().getHours();
+      let greetingText = '下午好！';
+      if (hours >= 5 && hours < 11) {
+        greetingText = '早上好！';
+      } else if (hours >= 11 && hours < 13) {
+        greetingText = '中午好！';
+      } else if (hours >= 13 && hours < 18) {
+        greetingText = '下午好！';
+      } else {
+        greetingText = '晚上好！';
+      }
+      greetingEl.textContent = greetingText;
     }
 
     // ─── 名言切换 ────────────────────────────────────────────────────
@@ -1811,18 +2706,18 @@
       quoteIndex = (quoteIndex + 1) % quotes.length;
       const textEl = document.getElementById('quoteText');
       const authEl = document.getElementById('quoteAuthor');
-      
+
       // 用轻微的淡入淡出动画过渡
       textEl.style.opacity = 0;
       authEl.style.opacity = 0;
-      
+
       setTimeout(() => {
         textEl.textContent = quotes[quoteIndex].text;
         authEl.textContent = quotes[quoteIndex].author;
         textEl.style.opacity = 1;
         authEl.style.opacity = 1;
       }, 200);
-      
+
       logConsole(`校园寄语切换："${quotes[quoteIndex].author}" 语录`, 'info');
     }
 
@@ -1839,25 +2734,25 @@
       const avatar = document.getElementById('userAvatar');
       const name = document.getElementById('userName');
       const status = document.getElementById('userStatus');
-      
+
       const loginWarning = document.getElementById('msgLoginWarning');
       const messageFileList = document.getElementById('messageFileList');
-      
+
       if (isLoggedIn) {
         avatar.textContent = '🏫';
         name.textContent = '高一(12)班 班级一体机';
         status.textContent = '已通过仰山校园网鉴权';
-        
-        if(loginWarning) loginWarning.style.display = 'none';
-        if(messageFileList) messageFileList.style.display = 'block';
+
+        if (loginWarning) loginWarning.style.display = 'none';
+        if (messageFileList) messageFileList.style.display = 'block';
         logConsole('Tauri Auth: 一体机网络会话鉴权通过，Cookie 已加密写入本地 db.json。', 'success');
       } else {
         avatar.textContent = '🔑';
         name.textContent = '未登录一体机';
         status.textContent = '点击登录绑定班级';
-        
-        if(loginWarning) loginWarning.style.display = 'flex';
-        if(messageFileList) messageFileList.style.display = 'none';
+
+        if (loginWarning) loginWarning.style.display = 'flex';
+        if (messageFileList) messageFileList.style.display = 'none';
         logConsole('Tauri Auth: 已清除本地 Session 会话 Cookie，站内信附件访问锁闭。', 'warn');
       }
     }
@@ -1867,7 +2762,7 @@
       isDarkTheme = !isDarkTheme;
       const icon = document.querySelector('.theme-icon');
       const text = document.querySelector('.theme-text');
-      
+
       if (isDarkTheme) {
         document.documentElement.classList.add('dark-theme');
         icon.textContent = '☀️';
@@ -1881,76 +2776,7 @@
       }
     }
 
-    // ─── 校园资讯新闻渲染 ──────────────────────────────────────────────
-    function loadNewsList() {
-      const colVal = document.getElementById('newsColumnSelect').value;
-      const container = document.getElementById('newsItemsContainer');
-      const data = newsData[colVal] || [];
-      
-      container.innerHTML = '';
-      data.forEach((article, idx) => {
-        const item = document.createElement('div');
-        item.className = `master-item ${idx === 0 ? 'active' : ''}`;
-        item.innerHTML = `
-          <div style="font-weight: 500; font-size:13px; margin-bottom:4px; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${article.title}</div>
-          <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--muted);">
-            <span>${article.author}</span>
-            <span>${article.date}</span>
-          </div>
-        `;
-        item.onclick = () => {
-          document.querySelectorAll('#newsItemsContainer .master-item').forEach(m => m.classList.remove('active'));
-          item.classList.add('active');
-          showNewsDetails(article);
-        };
-        container.appendChild(item);
-      });
-      
-      if (data.length > 0) {
-        showNewsDetails(data[0]);
-      } else {
-        document.getElementById('newsDetailView').innerHTML = `
-          <div style="margin:auto; text-align:center; color:var(--muted);">暂无新闻内容</div>
-        `;
-      }
-      logConsole(`Tauri API: 拉取新闻栏目 [${colVal}] 文章列表成功`, 'success');
-    }
 
-    function showNewsDetails(article) {
-      const view = document.getElementById('newsDetailView');
-      let attsHtml = '';
-      if (article.attachments && article.attachments.length > 0) {
-        attsHtml = `
-          <div style="margin-top:20px; border-top:1px solid var(--border); padding-top:16px;">
-            <div style="font-size:12px; font-weight:600; color:var(--accent); margin-bottom:10px;">📎 关联附件 (${article.attachments.length}个)</div>
-            <div style="display:flex; flex-direction:column; gap:8px;">
-              ${article.attachments.map(att => `
-                <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 12px; border:1px solid var(--border); border-radius:var(--radius); background:var(--bg); font-size:12px;">
-                  <span>${att}</span>
-                  <button class="btn btn-secondary btn-sm" style="padding:4px 8px;" onclick="simulateFileDownload('${att}')">下载附件</button>
-                </div>
-              `).join('')}
-            </div>
-          </div>
-        `;
-      }
-      
-      view.innerHTML = `
-        <div style="border-bottom:1px solid var(--border); padding-bottom:12px;">
-          <h2 style="font-family:var(--font-display); font-size:18px; font-weight:normal; margin:0 0 8px 0; line-height:1.4;">${article.title}</h2>
-          <div style="font-size:11px; color:var(--muted); display:flex; gap:16px;">
-            <span>发布者: ${article.author}</span>
-            <span>日期: ${article.date}</span>
-            <span>文章ID: ${article.id}</span>
-          </div>
-        </div>
-        <div style="flex:1; font-size:13px; line-height:1.7; color:var(--fg); overflow-y:auto; padding-top:4px;">
-          ${article.content}
-        </div>
-        ${attsHtml}
-      `;
-      logConsole(`Tauri API: 解析阅读文章 [${article.id}] 详情及 HTML 链接锚文本成功`, 'info');
-    }
 
     // ─── 校园查询逻辑（值周、纪律卫生、寝室楼宇、失物招领） ───────────────
     function switchQueryTab(tabId, element) {
@@ -1959,11 +2785,11 @@
         btns.forEach(b => b.classList.remove('active'));
         element.classList.add('active');
       }
-      
+
       const contents = document.querySelectorAll('#panel-queries .query-tab-content');
       contents.forEach(c => c.style.display = 'none');
       document.getElementById(`query-${tabId}`).style.display = 'block';
-      
+
       logConsole(`校园查询：切入子功能模块 [${tabId}]`, 'info');
     }
 
@@ -1972,7 +2798,7 @@
       document.getElementById('dutyResultTitle').textContent = "第六周值周安排表 (当前周次高亮)";
       const container = document.getElementById('dutyResultContent');
       container.innerHTML = '';
-      
+
       dutyData.forEach(item => {
         const isCurrent = item.week === 6;
         const el = document.createElement('div');
@@ -2002,7 +2828,7 @@
       document.getElementById('dutyResultTitle').textContent = "全学期值周安排总表";
       const container = document.getElementById('dutyResultContent');
       container.innerHTML = '';
-      
+
       dutyData.forEach(item => {
         const el = document.createElement('div');
         el.className = 'info-item';
@@ -2028,21 +2854,21 @@
         alert("请输入要检索的教师姓名或班级名称");
         return;
       }
-      
+
       logConsole(`Tauri API: 执行 'python3 ch_cli.py duty --search ${query}' 检索中...`, 'info');
-      
+
       // 模拟超时与偶发网络报错重试机制
       simulateTimeoutAndRetry(() => {
         document.getElementById('dutyResultTitle').textContent = `值周搜索结果: "${query}"`;
         const container = document.getElementById('dutyResultContent');
         container.innerHTML = '';
-        
-        const filtered = dutyData.filter(item => 
-          item.leader.includes(query) || 
-          item.staff.includes(query) || 
+
+        const filtered = dutyData.filter(item =>
+          item.leader.includes(query) ||
+          item.staff.includes(query) ||
           item.cls.includes(query)
         );
-        
+
         if (filtered.length === 0) {
           container.innerHTML = `<div style="text-align:center; padding-block:20px; color:var(--muted); font-size:12px;">未检索到匹配的值周记录</div>`;
           logConsole(`检索已响应：未找到含有 "${query}" 的值周项`, 'warn');
@@ -2073,9 +2899,9 @@
       const cls = document.getElementById('hygieneClassFilter').value;
       const container = document.getElementById('hygieneResultList');
       container.innerHTML = '';
-      
+
       const filtered = cls === 'all' ? hygieneRecords : hygieneRecords.filter(r => r.title.includes(cls));
-      
+
       filtered.forEach(r => {
         const el = document.createElement('div');
         el.className = 'info-item';
@@ -2098,10 +2924,10 @@
       const grade = document.getElementById('bedGradeSelect').value;
       const clsNum = document.getElementById('bedClassNum').value;
       const key = `${grade}-${clsNum}`;
-      
+
       const resContainer = document.getElementById('classBedResult');
       resContainer.innerHTML = '正在拉取班级寝室房间号分配数据...';
-      
+
       simulateTimeoutAndRetry(() => {
         const list = bedroomAllocation[key];
         if (list) {
@@ -2129,23 +2955,23 @@
       const start = document.getElementById('bedStartDate').value;
       const end = document.getElementById('bedEndDate').value;
       const showAll = document.getElementById('bedShowAllSwitch').checked;
-      
+
       const container = document.getElementById('buildingResultContent');
       container.innerHTML = '<div style="text-align:center; padding-block:15px; font-size:12px; color:var(--muted);">正在解析楼宇宿舍打分详情...</div>';
-      
+
       // 映射现实命名
       let buildName = "5 号楼 (男寝)";
       if (building === "1") buildName = "1 号楼 (女寝)";
       if (building === "9") buildName = "3 号楼";
-      
+
       document.getElementById('buildingResultTitle').textContent = `${buildName} 卫生纪律考评表 (${start} 至 ${end})`;
-      
+
       simulateTimeoutAndRetry(() => {
         const dataList = buildingHygieneData[building] || [];
         container.innerHTML = '';
-        
+
         let filtered = showAll ? dataList : dataList.filter(item => !item.score.includes("10分"));
-        
+
         if (filtered.length === 0) {
           container.innerHTML = `<div style="text-align:center; padding-block:15px; color:var(--success); font-size:12px;">✓ 恭喜，该筛选范围内没有任何扣分宿记录！</div>`;
           logConsole(`楼宇检索：${buildName} 无任何扣分宿舍。`, 'success');
@@ -2173,15 +2999,15 @@
     function loadLostFoundList() {
       const container = document.getElementById('lostFoundList');
       container.innerHTML = '';
-      
+
       lostFoundData.forEach(item => {
         const el = document.createElement('div');
         el.className = 'info-item';
         el.style.cursor = 'pointer';
-        
+
         const isLost = item.title.startsWith("丢失");
         const statusColor = item.status === "寻找中" ? 'var(--warning)' : item.status === '待领' ? 'var(--accent)' : 'var(--success)';
-        
+
         el.innerHTML = `
           <div class="info-header">
             <span class="info-title" style="font-weight:500;">${item.title}</span>
@@ -2211,7 +3037,7 @@
         alert("请输入要检索的登记 ID (例如 LF-402)");
         return;
       }
-      
+
       const item = lostFoundData.find(d => d.id === id);
       if (item) {
         showLostFoundDetails(item);
@@ -2228,11 +3054,11 @@
         btns.forEach(b => b.classList.remove('active'));
         element.classList.add('active');
       }
-      
+
       const contents = document.querySelectorAll('#panel-archive .tab-content');
       contents.forEach(c => c.style.display = 'none');
       document.getElementById(`archive-${tabId}`).style.display = 'block';
-      
+
       logConsole(`文件归档：切换至选项页 [${tabId}]`, 'info');
     }
 
@@ -2241,25 +3067,25 @@
       const barContainer = document.getElementById('progressBarContainer');
       const bar = document.getElementById('progressBar');
       const status = document.getElementById('downloadStatus');
-      
+
       if (!code) {
         status.textContent = '请输入寄存服务提取密码。';
         status.style.color = 'var(--error)';
         return;
       }
-      
+
       barContainer.style.display = 'block';
       bar.style.width = '0%';
       status.textContent = '初始化 Tauri IPC 安全连接信道并握手...';
       status.style.color = 'var(--muted)';
       logConsole(`提取码下载：发起提取连接验证 [密码: ${code}]`, 'info');
-      
+
       let progress = 0;
       const interval = setInterval(() => {
         progress += 10;
         bar.style.width = `${progress}%`;
         status.textContent = `正从校园服务器拉取分片并验证校验和... ${progress}%`;
-        
+
         if (progress >= 100) {
           clearInterval(interval);
           status.textContent = `✓ 提取成功！已在系统 Downloads 目录中恢复文件 '春晖仰山风光航拍.mp4'。`;
@@ -2268,7 +3094,7 @@
         }
       }, 150);
     }
-    
+
     function simulateFileDownload(fileName) {
       logConsole(`收件箱附件提取：${fileName}`, 'info');
       alert(`下载成功！文件已存盘至：Downloads/${fileName}`);
@@ -2292,45 +3118,45 @@
       const percentEl = document.getElementById('uploadProgressPercent');
       const bar = document.getElementById('uploadProgressBar');
       const msg = document.getElementById('uploadStatusMessage');
-      
+
       pSection.style.display = 'block';
       nameEl.textContent = fileName;
       percentEl.textContent = '0%';
       bar.style.width = '0%';
       msg.style.color = 'var(--muted)';
       msg.textContent = '解析文件，启动 2MB 规格逻辑分片封包引擎...';
-      
+
       logConsole(`文件寄存：开始上传文件 [${fileName}]`, 'info');
-      
+
       // 分片模拟
       let totalSize = fileSize || 1024 * 1024 * 7.5; // 缺省 7.5MB
       const chunkSize = 2 * 1024 * 1024; // 2MB
       const totalChunks = Math.ceil(totalSize / chunkSize);
       let currentChunk = 0;
-      
+
       logConsole(`切片引擎：拆分为 ${totalChunks} 个逻辑分片 (每分片 2MB规格)`, 'info');
-      
+
       const uploadInterval = setInterval(() => {
         currentChunk++;
         const percent = Math.min(Math.round((currentChunk / totalChunks) * 100), 100);
         bar.style.width = `${percent}%`;
         percentEl.textContent = `${percent}%`;
-        
+
         msg.textContent = `正在上传第 ${currentChunk}/${totalChunks} 逻辑分片...`;
         logConsole(`Tauri IPC: 上传分片 [${currentChunk}/${totalChunks}] - 2MB 状态 ok`, 'info');
-        
+
         if (currentChunk >= totalChunks) {
           clearInterval(uploadInterval);
           msg.textContent = '所有分片传输完毕！正在请求 Rust 后端进行分片校验与合并...';
           logConsole('上传校验：分片传输完毕，请求触发服务器端 merge_chunks() API', 'info');
-          
+
           setTimeout(() => {
             const generatedCode = Math.floor(100000 + Math.random() * 900000); // 随机生成6位数密码
             msg.innerHTML = `<span style="color:var(--success); font-weight:600;">✓ 寄存上传合并成功！提取密码：<b>${generatedCode}</b> (已复制至剪贴板)</span>`;
             logConsole(`合成分片成功！提取凭证密码: ${generatedCode}`, 'success');
-            
+
             // 复制到剪贴板模拟
-            navigator.clipboard.writeText(generatedCode.toString()).catch(() => {});
+            navigator.clipboard.writeText(generatedCode.toString()).catch(() => { });
             alert(`上传成功！您的文件提取密码为：${generatedCode}，已复制到剪切板。`);
           }, 1000);
         }
@@ -2342,13 +3168,13 @@
       const btn = document.getElementById('btnStartLottery');
       const display = document.getElementById('lotteryNumber');
       const classSize = parseInt(document.getElementById('classSize').value) || 55;
-      
+
       if (lotteryInterval) {
         // 停止抽奖
         clearInterval(lotteryInterval);
         lotteryInterval = null;
         btn.textContent = '开始抽取';
-        
+
         // 随机确定一个最终号码
         const finalNum = Math.floor(Math.random() * classSize) + 1;
         display.textContent = finalNum.toString().padStart(2, '0');
@@ -2358,7 +3184,7 @@
         // 开始抽奖
         btn.textContent = '锁定';
         logConsole('启动课堂点名随机滚动签名器...', 'info');
-        
+
         lotteryInterval = setInterval(() => {
           const randNum = Math.floor(Math.random() * classSize) + 1;
           display.textContent = randNum.toString().padStart(2, '0');
@@ -2383,24 +3209,24 @@
       const container = document.getElementById('cardStack');
       container.innerHTML = '';
       currentCards = [...cardTopics].sort(() => Math.random() - 0.5);
-      
+
       currentCards.forEach((card, idx) => {
         const cardEl = document.createElement('div');
         cardEl.className = 'stack-card';
         cardEl.style.zIndex = idx + 1;
         cardEl.style.transform = `translateY(${idx * -6}px) scale(${1 - (currentCards.length - idx) * 0.02}) rotate(${(idx - 3) * 1.5}deg)`;
-        
+
         cardEl.innerHTML = `
           <div class="card-type">${card.type === 'truth' ? '𓃠 真心话' : '𓅪 大冒险'}</div>
           <div class="card-content">${card.content}</div>
           <div class="card-tip">${card.tip}</div>
         `;
-        
+
         // 点击卡牌滑走
         cardEl.addEventListener('click', () => {
           swipeCard(cardEl, idx);
         });
-        
+
         container.appendChild(cardEl);
       });
       logConsole('工具箱：破冰互动真心话大冒险洗牌完毕。', 'success');
@@ -2410,7 +3236,7 @@
       cardEl.style.transform = `translate(380px, -180px) rotate(40deg)`;
       cardEl.style.opacity = '0';
       logConsole(`划走互动卡片: [${currentCards[index].type === 'truth' ? '真心话' : '大冒险'}]`, 'info');
-      
+
       setTimeout(() => {
         cardEl.remove();
       }, 300);
@@ -2432,7 +3258,7 @@
     function simulateTimeoutAndRetry(onSuccess) {
       // 模拟可能出现的异常重试：随机 35% 几率触发重试以展示底层健壮性设计
       const needRetry = Math.random() < 0.35;
-      
+
       if (needRetry) {
         logConsole('make_request(): 正在尝试向校园服务器建立底层 http 通道...', 'info');
         setTimeout(() => {
@@ -2475,10 +3301,10 @@
         const input = document.getElementById('consoleInput');
         const code = input.value.trim();
         if (!code) return;
-        
+
         logConsole(`> ${code}`, 'info');
         input.value = '';
-        
+
         if (code.toLowerCase() === 'help') {
           logConsole('支持的底层测试命令:\n  help - 查看支持命令\n  clear - 清理日志屏\n  tauri-info - 打印 Tauri 环境元数据\n  debug-login - 触发一体机会话绑定与解除\n  set-class-size <num> - 修改抽签总人数', 'info');
         } else if (code.toLowerCase() === 'clear') {
@@ -2499,7 +3325,7 @@
           try {
             // 安全沙盒化模拟 eval 结果
             logConsole(`Result: undefined (模拟代码已传输至 Tauri IPC 调度系统)`, 'success');
-          } catch(e) {
+          } catch (e) {
             logConsole(`Error: ${e.message}`, 'error');
           }
         }
@@ -2507,4 +3333,5 @@
     }
   </script>
 </body>
+
 </html>
