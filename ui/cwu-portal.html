@@ -833,6 +833,92 @@
       font-weight: 500;
     }
 
+    /* ─── 春晖图库网格与卡片样式 ────────────────────────────────────────── */
+    .photo-card {
+      position: relative;
+      aspect-ratio: 4/3;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    }
+
+    .photo-card:hover {
+      transform: scale(1.03);
+      box-shadow: var(--shadow-md);
+      border-color: var(--accent);
+    }
+
+    .photo-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .photo-card .photo-title {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+      color: #fff;
+      font-size: 11px;
+      padding: 8px 10px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .photo-card:hover .photo-title {
+      opacity: 1;
+    }
+
+    .folder-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .folder-card:hover {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .folder-card .folder-icon {
+      font-size: 24px;
+    }
+
+    .folder-card .folder-info {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .folder-card .folder-name {
+      font-weight: 500;
+      font-size: 13px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .folder-card .folder-desc {
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
     /* ─── 提示条 (Alerts) ───────────────────────────────────────────── */
     .banner {
       display: flex;
@@ -2187,16 +2273,36 @@
 
         <!-- 8. 春晖图库面板 -->
         <div class="panel-view" id="panel-gallery">
-          <header>
-            <div class="page-eyebrow">Campus Gallery</div>
-            <h1 class="page-title">春晖图库</h1>
+          <header style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px;">
+            <div>
+              <div class="page-eyebrow" id="gallery-eyebrow">Campus Gallery</div>
+              <h1 class="page-title" id="gallery-title">春晖图库</h1>
+            </div>
+            <button class="btn btn-secondary btn-sm" onclick="openGalleryWeb()" style="margin-bottom: 4px;">
+              <span>🌐</span> 打开网页版 ↗
+            </button>
           </header>
-          <div class="card" style="padding: 0; overflow: hidden; height: 560px; border: 1px solid var(--border);">
-            <iframe 
-              src="http://10.181.201.188:5000/?launchApp=SYNO.Foto.AppInstance&SynoToken=zmwdE4vqUthmo#/shared_space/folder/1" 
-              style="width: 100%; height: 100%; border: none;"
-              allowfullscreen>
-            </iframe>
+
+          <!-- 面包屑导航 -->
+          <div id="gallery-nav-bar" style="margin-bottom: 16px; display: none; align-items: center; gap: 8px; font-size: 13px;">
+            <span style="cursor: pointer; color: var(--accent); font-weight: 500;" onclick="showGalleryFolders()">📁 共享空间根目录</span>
+            <span style="color: var(--border);">/</span>
+            <span id="current-folder-name" style="color: var(--fg); font-weight: 500;">当前分类</span>
+          </div>
+
+          <!-- A. 文件夹网格展示区 -->
+          <div id="gallery-folders-view" class="card" style="min-height: 480px; padding: 20px;">
+            <div style="font-size: 14px; font-weight: 600; margin-bottom: 16px; color: var(--accent);">📁 共享文件夹列表</div>
+            <div id="foldersGrid" class="grid-3">
+              <!-- 动态渲染文件夹卡片 -->
+            </div>
+          </div>
+
+          <!-- B. 照片网格展示区 -->
+          <div id="gallery-items-view" class="card" style="display: none; min-height: 480px; padding: 20px;">
+            <div id="photosGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px;">
+              <!-- 动态渲染照片卡片 -->
+            </div>
           </div>
         </div>
 
@@ -2308,8 +2414,11 @@
           <div style="margin-top:12px; font-size:13px; color:#a8a29e;">正在从校园多媒体 CDN 高速缓冲流媒体...</div>
         </div>
       </div>
-      <div style="margin-top:16px; font-size:12px; color:var(--muted); line-height:1.5;">
-        <b>今日热播：</b>《白马湖畔的青春守护 - 任意门介绍视频》、《防溺水安全警示片》、《社团招新先导片》。
+      <div style="margin-top: 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px;">
+        <div style="font-size:12px; color:var(--muted); line-height:1.5; flex: 1;">
+          <b>今日热播：</b>《白马湖畔的青春守护 - 任意门介绍视频》、《防溺水安全警示片》、《社团招新先导片》。
+        </div>
+        <button class="btn btn-secondary btn-sm" style="flex-shrink: 0;" onclick="window.open('http://10.181.201.185:82/', '_blank')">🌐 打开网页视频站 ↗</button>
       </div>
     </div>
   </div>
@@ -2334,12 +2443,25 @@
               id="live-like-count">5.8k</span></div>
         </div>
       </div>
-      <div style="margin-top:16px; display:flex; justify-content:space-between; align-items:center;">
-        <div style="font-size:12px; color:var(--muted);">
-          直播源: 仰山报告厅主会场机位
+      <div style="margin-top:16px; display:flex; justify-content:space-between; align-items:center; gap: 12px;">
+        <div style="font-size:12px; color:var(--muted); display:flex; flex-direction:column; gap:4px;">
+          <div>直播源: 仰山报告厅主会场机位</div>
+          <div style="font-family: monospace; background: var(--bg-hover); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border); font-size: 11px;">rtmp://10.181.201.185/live/livestream</div>
         </div>
-        <button class="btn btn-primary btn-sm" onclick="likeLiveStream()">👍 给直播点赞</button>
+        <div style="display:flex; gap:8px; flex-shrink: 0;">
+          <button class="btn btn-secondary btn-sm" onclick="navigator.clipboard.writeText('rtmp://10.181.201.185/live/livestream'); logConsole('春晖直播：已复制直播源 RTMP 地址到剪贴板。', 'success'); alert('已成功复制 RTMP 直播源地址至剪贴板！');">📋 复制直播源</button>
+          <button class="btn btn-primary btn-sm" onclick="likeLiveStream()">👍 给直播点赞</button>
+        </div>
       </div>
+    </div>
+  </div>
+
+  <!-- 图库大图灯箱模态框 -->
+  <div id="cwu-gallery-modal" class="cwu-modal" onclick="closeModal('cwu-gallery-modal')">
+    <div class="cwu-modal-content" onclick="event.stopPropagation()" style="background: none; border: none; box-shadow: none; max-width: 90%; text-align: center;">
+      <span class="cwu-modal-close" onclick="closeModal('cwu-gallery-modal')" style="color: #fff; font-size: 32px; top: 10px; right: 10px;">✕</span>
+      <img id="lightbox-image" src="" style="max-width: 100%; max-height: 80vh; border-radius: var(--radius); border: 2px solid var(--border); box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4); object-fit: contain;" />
+      <div id="lightbox-title" style="color: #fff; margin-top: 12px; font-size: 14px; font-family: var(--font-display);"></div>
     </div>
   </div>
 
@@ -2560,6 +2682,7 @@
       loadLostFoundList();
       resetCardStack();
       loadAnnouncementsList();
+      showGalleryFolders();
 
       logConsole('春戊NEXT 客户端原型挂载成功。', 'info');
       logConsole('Tauri IPC 机制就绪。10s 请求保护与 3 次重试重连已绑定后台。', 'success');
@@ -2590,6 +2713,10 @@
       }
 
       logConsole(`Tauri 路由：切换至视图面板 [${panelId}]`, 'info');
+      
+      if (panelId === 'gallery') {
+        showGalleryFolders();
+      }
     }
 
     // ─── 校园视频与直播模拟 ──────────────────────────────────────────────
@@ -2597,12 +2724,9 @@
     let liveLikes = 5824;
 
     function playCampusVideo() {
-      const modal = document.getElementById('cwu-video-modal');
-      modal.style.display = 'flex';
-      // 复位播放画面
-      document.getElementById('video-placeholder').style.display = 'flex';
-      document.getElementById('simulated-video-screen').style.display = 'none';
-      logConsole('春晖视频：打开校园视频点播播放器。', 'info');
+      const webUrl = "http://10.181.201.185:82/";
+      window.open(webUrl, "_blank");
+      logConsole('春晖视频：直接在外部浏览器中打开校园视频点播站。', 'info');
     }
 
     function startSimulatedVideo() {
@@ -3296,6 +3420,155 @@
         // 常规正常调用
         setTimeout(onSuccess, 300);
       }
+    }
+
+    // ─── 春晖图库交互逻辑 (免登录共享空间) ──────────────────────────────────
+    let isGalleryLoaded = false;
+    let galleryFoldersData = [];
+
+    // 返回文件夹列表根目录视图
+    function showGalleryFolders() {
+      document.getElementById('gallery-folders-view').style.display = 'block';
+      document.getElementById('gallery-items-view').style.display = 'none';
+      document.getElementById('gallery-nav-bar').style.display = 'none';
+
+      if (!isGalleryLoaded) {
+        loadGalleryFolders();
+      }
+    }
+
+    // 动态提取并加载共享文件夹
+    function loadGalleryFolders() {
+      const grid = document.getElementById('foldersGrid');
+      grid.innerHTML = '<div style="grid-column: span 3; text-align:center; padding-block:30px; color:var(--muted);">正在通过后端抓取共享相册文件夹...</div>';
+      
+      logConsole("Tauri IPC: 发起抓取指令 'python3 ch_cli.py gallery folders'", "info");
+
+      simulateTimeoutAndRetry(() => {
+        // Mock 预留数据以支持离线预览
+        galleryFoldersData = [
+          { id: 91, name: "2018 春晖中学校庆110周年专题", count: 23 },
+          { id: 335, name: "【春晖建筑】仰山与白马湖", count: 50 },
+          { id: 102, name: "2026 届高一社团联合招新", count: 85 },
+          { id: 105, name: "白马湖畔的温柔晚霞 - 摄影社精选", count: 42 },
+          { id: 110, name: "2026年防溺水安全周班会图库", count: 18 }
+        ];
+
+        renderGalleryFolders(galleryFoldersData);
+        isGalleryLoaded = true;
+        logConsole("Tauri IPC: 成功获取 23 个群晖共享文件夹列表", "success");
+      });
+    }
+
+    // 渲染文件夹网格
+    function renderGalleryFolders(folders) {
+      const grid = document.getElementById('foldersGrid');
+      grid.innerHTML = '';
+
+      folders.forEach(f => {
+        const el = document.createElement('div');
+        el.className = 'folder-card';
+        el.style.display = 'flex';
+        el.style.alignItems = 'center';
+        el.style.gap = '14px';
+        el.onclick = () => loadGalleryPhotos(f.id, f.name);
+
+        // 拼接文件夹封面缩略图，群晖会自动提取该文件夹下的封面项返回图片
+        const folderThumbUrl = `http://10.181.201.188:5000/webapi/entry.cgi?api=SYNO.Foto.Thumbnail&method=get&version=1&SynoToken=zmwdE4vqUthmo&id=${f.id}&size=m`;
+
+        el.innerHTML = `
+          <div class="folder-thumb-container" style="width: 48px; height: 48px; border-radius: 4px; overflow: hidden; background: var(--border); flex-shrink: 0; display: grid; place-items: center;">
+            <img src="${folderThumbUrl}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.outerHTML='<span style=\\'font-size:24px;\\'>📁</span>';" />
+          </div>
+          <div class="folder-info" style="min-width: 0;">
+            <span class="folder-name" title="${f.name}">${f.name}</span>
+            <span class="folder-desc">ID: ${f.id} | ${f.count} 项</span>
+          </div>
+        `;
+        grid.appendChild(el);
+      });
+    }
+
+    // 提取并加载相片项
+    function loadGalleryPhotos(folderId, folderName) {
+      document.getElementById('gallery-folders-view').style.display = 'none';
+      document.getElementById('gallery-items-view').style.display = 'block';
+      document.getElementById('gallery-nav-bar').style.display = 'flex';
+      document.getElementById('current-folder-name').textContent = folderName;
+
+      const grid = document.getElementById('photosGrid');
+      grid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding-block:30px; color:var(--muted);">正在读取相册图片元数据...</div>';
+
+      logConsole(`Tauri IPC: 发起抓取指令 'python3 ch_cli.py gallery items --folder ${folderId}'`, "info");
+
+      simulateTimeoutAndRetry(() => {
+        // 本地 Mock 数据保障离线完整性，如果 ID 是 335 融入真实的“春晖大道.jpg”
+        let mockPhotos = [];
+        if (folderId === 335) {
+          mockPhotos = [
+            { id: 9631, filename: "春晖大道.jpg" },
+            { id: 9632, filename: "仰山远眺.jpg" },
+            { id: 9633, filename: "白马湖夕阳.jpg" },
+            { id: 9634, filename: "曲径长廊.jpg" },
+            { id: 9635, filename: "一字亭小憩.jpg" },
+            { id: 9636, filename: "春晖中学老校门.jpg" }
+          ];
+        } else {
+          mockPhotos = [
+            { id: 8001, filename: "白马湖晨曦.jpg" },
+            { id: 8002, filename: "仰山大雪.jpg" },
+            { id: 8003, filename: "校庆合影.jpg" },
+            { id: 8004, filename: "社团风采展.jpg" }
+          ];
+        }
+
+        renderGalleryPhotos(mockPhotos);
+        logConsole(`Tauri IPC: 成功从文件夹 [${folderName}] 提取 ${mockPhotos.length} 张照片列表`, "success");
+      });
+    }
+
+    // 渲染照片瀑布流网格
+    function renderGalleryPhotos(photos) {
+      const grid = document.getElementById('photosGrid');
+      grid.innerHTML = '';
+
+      photos.forEach(p => {
+        const el = document.createElement('div');
+        el.className = 'photo-card';
+        
+        // 拼接真实的群晖免登录缩略图 URL
+        const thumbUrl = `http://10.181.201.188:5000/webapi/entry.cgi?api=SYNO.Foto.Thumbnail&method=get&version=1&SynoToken=zmwdE4vqUthmo&id=${p.id}&size=m`;
+        
+        // 点击调用 Lightbox
+        el.onclick = () => openGalleryLightbox(p.id, p.filename);
+
+        el.innerHTML = `
+          <img src="${thumbUrl}" alt="${p.filename}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'100\\' height=\\'100\\' viewBox=\\'0 0 100 100\\'><rect width=\\'100%\\' height=\\'100%\\' fill=\\'%23f3f2ef\\'/><text x=\\'50%\\' y=\\'50%\\' font-size=\\'10\\' fill=\\'%23a8a29e\\' text-anchor=\\'middle\\' dominant-baseline=\\'middle\\'>加载失败</text></svg>';" />
+          <div class="photo-title">${p.filename}</div>
+        `;
+        grid.appendChild(el);
+      });
+    }
+
+    // 打开大图灯箱
+    function openGalleryLightbox(photoId, filename) {
+      const modal = document.getElementById('cwu-gallery-modal');
+      const img = document.getElementById('lightbox-image');
+      const title = document.getElementById('lightbox-title');
+
+      // 拼装高清大图链接 (xl 尺寸)
+      img.src = `http://10.181.201.188:5000/webapi/entry.cgi?api=SYNO.Foto.Thumbnail&method=get&version=1&SynoToken=zmwdE4vqUthmo&id=${photoId}&size=xl`;
+      title.textContent = `${filename} (高清原图 ID: ${photoId})`;
+      
+      modal.style.display = 'flex';
+      logConsole(`大图预览：打开大图灯箱 [${filename}]`, "info");
+    }
+
+    // 打开群晖相册网页版
+    function openGalleryWeb() {
+      const webUrl = "http://10.181.201.188:5000/?launchApp=SYNO.Foto.AppInstance&SynoToken=zmwdE4vqUthmo#/shared_space/folder/1";
+      window.open(webUrl, "_blank");
+      logConsole("图库跳转：在外部浏览器中打开群晖相册网页版", "info");
     }
 
     // ─── 开发者工具 Console Simulator ────────────────────────────────
