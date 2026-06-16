@@ -1424,6 +1424,10 @@
               <span class="icon">𓆭</span>
               <span>壁纸订阅</span>
             </div>
+            <div class="nav-item" data-panel="gallery" onclick="switchPanel('gallery', this)">
+              <span class="icon">🖼️</span>
+              <span>春晖图库</span>
+            </div>
             <div class="nav-item" data-panel="settings" onclick="switchPanel('settings', this)">
               <span class="icon">⚙</span>
               <span>设置选项</span>
@@ -1496,7 +1500,7 @@
                     <span class="desc">连接校园云服务与网盘平台</span>
                   </div>
                   <!-- 春晖图库 -->
-                  <div class="portal-grid-item" onclick="switchPanel('wallpaper')">
+                  <div class="portal-grid-item" onclick="switchPanel('gallery')">
                     <span class="icon">🖼️</span>
                     <span class="title">春晖图库</span>
                     <span class="desc">展示校园活动照片及精选素材</span>
@@ -2178,6 +2182,21 @@
                 <span>🔄</span> 设置每日自动轮播
               </button>
             </div>
+          </div>
+        </div>
+
+        <!-- 8. 春晖图库面板 -->
+        <div class="panel-view" id="panel-gallery">
+          <header>
+            <div class="page-eyebrow">Campus Gallery</div>
+            <h1 class="page-title">春晖图库</h1>
+          </header>
+          <div class="card" style="padding: 0; overflow: hidden; height: 560px; border: 1px solid var(--border);">
+            <iframe 
+              src="http://10.181.201.188:5000/?launchApp=SYNO.Foto.AppInstance&SynoToken=zmwdE4vqUthmo#/shared_space/folder/1" 
+              style="width: 100%; height: 100%; border: none;"
+              allowfullscreen>
+            </iframe>
           </div>
         </div>
 
