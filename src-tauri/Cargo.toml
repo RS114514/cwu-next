@@ -1,0 +1,55 @@
+[package]
+name = "cwu-portal"
+version = "0.1.0"
+description = "春戊NEXT - 桌面客户端"
+authors = ["HigherSY", "Axell_wppr", "Coder014"]
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "=1.4.0" }
+
+[dependencies]
+tauri = { version = "=1.4.0", features = ["api-all"] }
+serde = { version = "=1.0.159", features = ["derive"] }
+serde_json = "=1.0.95"
+tempfile = "=3.3.0"
+time = "=0.3.19"
+getrandom = "=0.2.8"
+thiserror = "=1.0.40"
+url = "=2.4.0"
+security-framework = "=2.9.2"
+native-tls = "=0.2.11"
+mac-notification-sys = "=0.6.1"
+ignore = "=0.4.20"
+globset = "=0.4.10"
+image = "=0.24.9"
+flate2 = "=1.0.26"
+fdeflate = "=0.3.0"
+dtoa = "=1.0.9"
+objc2 = "=0.4.0"
+objc2-foundation = "=0.2.0"
+anyhow = "=1.0.70"
+rayon-core = "=1.12.0"
+quote = "=1.0.35"
+proc-macro2 = "=1.0.75"
+nix = "=0.26.4"
+toml_write = "=0.1.0"
+os_info = "=3.5.0"
+regex-syntax = "=0.7.5"
+tracing = "=0.1.37"
+tracing-core = "=0.1.30"
+lock_api = "=0.4.9"
+regex = "=1.9.6"
+hashbrown = "=0.14.3"
+indexmap = "=2.0.2"
+futures-core = "=0.3.31"
+futures-task = "=0.3.31"
+futures-util = "=0.3.31"
+string_cache = "=0.8.7"
+parking_lot_core = "=0.9.9"
+libc = "=0.2.150"
+winnow = "=0.5.15"
+
+[patch.crates-io]
+moxcms = { path = "dummy/moxcms" }
+idna_adapter = { path = "dummy/idna_adapter" }

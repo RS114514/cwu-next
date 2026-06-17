@@ -1,0 +1,5 @@
+[source.crates-io]
+replace-with = 'aliyun-sparse'
+
+[source.aliyun-sparse]
+registry = "sparse+http://mirrors.aliyun.com/crates.io-index/"

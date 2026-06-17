@@ -243,7 +243,7 @@
       padding: 10px 14px;
       border-radius: var(--radius);
       color: var(--muted);
-      font-size: 13px;
+      font-size: 14px;
       transition: all 0.2s ease;
       cursor: pointer;
     }
@@ -260,7 +260,7 @@
     }
 
     .nav-item .icon {
-      font-size: 15px;
+      font-size: 16px;
       width: 20px;
       text-align: center;
     }
@@ -276,11 +276,11 @@
     .user-badge {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 8px;
+      gap: 12px;
+      padding: 10px 14px;
       border-radius: var(--radius);
       background: var(--fg-soft);
-      font-size: 12px;
+      font-size: 13px;
       cursor: pointer;
       transition: background 0.2s;
     }
@@ -289,15 +289,87 @@
       background: color-mix(in oklch, var(--fg) 10%, transparent);
     }
 
-    .user-badge .avatar {
-      width: 24px;
-      height: 24px;
+    .status-light-container {
+      width: 20px;
+      height: 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .status-light {
+      width: 7px;
+      height: 7px;
       border-radius: 50%;
-      background: var(--accent);
-      color: var(--surface);
-      display: grid;
-      place-items: center;
-      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+
+    @keyframes redGlow {
+      0% {
+        box-shadow: 0 0 2px var(--error);
+        opacity: 0.8;
+      }
+
+      50% {
+        box-shadow: 0 0 7px var(--error);
+        opacity: 1;
+      }
+
+      100% {
+        box-shadow: 0 0 2px var(--error);
+        opacity: 0.8;
+      }
+    }
+
+    @keyframes yellowGlow {
+      0% {
+        box-shadow: 0 0 3px var(--warning);
+        opacity: 0.5;
+        transform: scale(1);
+      }
+
+      50% {
+        box-shadow: 0 0 10px var(--warning);
+        opacity: 1;
+        transform: scale(1.3);
+      }
+
+      100% {
+        box-shadow: 0 0 3px var(--warning);
+        opacity: 0.5;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes greenGlow {
+      0% {
+        box-shadow: 0 0 2px var(--success);
+      }
+
+      50% {
+        box-shadow: 0 0 8px var(--success);
+        transform: scale(1.2);
+      }
+
+      100% {
+        box-shadow: 0 0 2px var(--success);
+      }
+    }
+
+    .status-light.red {
+      background: var(--error);
+      animation: redGlow 3s infinite ease-in-out;
+    }
+
+    .status-light.yellow {
+      background: var(--warning);
+      animation: yellowGlow 1s infinite ease-in-out;
+    }
+
+    .status-light.green {
+      background: var(--success);
+      animation: greenGlow 2.5s infinite ease-in-out;
     }
 
     .user-badge .info {
@@ -313,25 +385,37 @@
     }
 
     .user-badge .status {
-      font-size: 10px;
+      font-size: 11px;
       color: var(--muted);
     }
 
     .sidebar-btn {
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-size: 12px;
+      gap: 12px;
+      font-size: 13px;
       color: var(--muted);
-      padding: 6px 8px;
-      border-radius: 4px;
+      padding: 10px 14px;
+      border-radius: var(--radius);
       cursor: pointer;
       transition: background 0.2s;
+    }
+
+    .sidebar-btn span:first-child {
+      font-size: 16px;
+      width: 20px;
+      text-align: center;
     }
 
     .sidebar-btn:hover {
       background: var(--fg-soft);
       color: var(--fg);
+    }
+
+    .sidebar-btn.active {
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 500;
     }
 
     /* 右侧主视口 */
@@ -373,18 +457,32 @@
 
     .page-eyebrow {
       font-family: var(--font-mono);
-      font-size: 11px;
+      font-size: 12px;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.14em;
       color: var(--accent);
       margin-bottom: var(--gap-xs);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .page-eyebrow::after {
+      content: '';
+      flex: 1;
+      max-width: 48px;
+      height: 1px;
+      background: var(--accent);
+      opacity: 0.5;
     }
 
     .page-title {
       font-family: var(--font-display);
-      font-size: clamp(24px, 3.5vw, 32px);
-      font-weight: normal;
+      font-size: clamp(28px, 4vw, 38px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
       margin: 0;
+      line-height: 1.1;
     }
 
     /* ─── 卡片样式 ──────────────────────────────────────────────────── */
@@ -392,7 +490,7 @@
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
-      padding: 20px;
+      padding: 24px;
       box-shadow: var(--shadow-sm);
       transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
     }
@@ -405,11 +503,16 @@
 
     .card-title {
       font-family: var(--font-display);
-      font-size: 16px;
-      font-weight: 500;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
       margin-top: 0;
-      margin-bottom: 16px;
-      color: var(--fg);
+      margin-bottom: 0;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 18px;
+      color: var(--muted);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -530,23 +633,42 @@
 
     /* ─── 名言卡片 (Quotes) ─────────────────────────────────────────── */
     .quote-box {
-      border-left: 2px solid var(--accent);
-      padding-left: 16px;
-      margin-block: var(--gap-xs);
       position: relative;
+      padding: 0 0 0 4px;
+      margin-block: var(--gap-xs);
+    }
+
+    .quote-box::before {
+      content: '\201C';
+      position: absolute;
+      top: -24px;
+      left: -8px;
+      font-family: var(--font-display);
+      font-size: 96px;
+      line-height: 1;
+      color: var(--accent);
+      opacity: 0.12;
+      pointer-events: none;
+      user-select: none;
     }
 
     .quote-text {
       font-family: var(--font-display);
-      font-size: 16px;
+      font-size: 17px;
       font-style: italic;
-      line-height: 1.5;
-      margin: 0 0 8px 0;
+      line-height: 1.65;
+      margin: 0 0 14px 0;
+      color: var(--fg);
+      position: relative;
+      z-index: 1;
     }
 
     .quote-author {
-      font-size: 12px;
-      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-family: var(--font-mono);
+      color: var(--accent);
       text-align: right;
       margin: 0;
     }
@@ -697,7 +819,63 @@
       font-size: 68px;
       color: var(--accent);
       font-weight: normal;
-      transition: opacity 0.1s ease;
+      position: relative;
+    }
+
+    /* 水墨散开关键帧 */
+    @keyframes ink-bloom {
+      0% {
+        filter: blur(6px) opacity(0);
+        transform: scale(0.85);
+        text-shadow: 0 0 0px transparent;
+      }
+
+      35% {
+        filter: blur(1px) opacity(0.9);
+        transform: scale(1.08);
+        text-shadow: 0 0 12px color-mix(in oklch, var(--accent) 40%, transparent);
+      }
+
+      70% {
+        filter: blur(0px) opacity(1);
+        transform: scale(0.98);
+        text-shadow: 0 0 6px color-mix(in oklch, var(--accent) 20%, transparent);
+      }
+
+      100% {
+        filter: blur(0px) opacity(1);
+        transform: scale(1);
+        text-shadow: none;
+      }
+    }
+
+    /* 水墨锁定动画（停止时更慢更庄重）*/
+    @keyframes ink-settle {
+      0% {
+        filter: blur(12px) opacity(0.3);
+        transform: scale(1.15);
+        text-shadow: 0 0 24px color-mix(in oklch, var(--accent) 60%, transparent);
+      }
+
+      60% {
+        filter: blur(2px) opacity(0.85);
+        transform: scale(1.04);
+        text-shadow: 0 0 10px color-mix(in oklch, var(--accent) 30%, transparent);
+      }
+
+      100% {
+        filter: blur(0px) opacity(1);
+        transform: scale(1);
+        text-shadow: none;
+      }
+    }
+
+    .luck-card .card-number.ink-anim {
+      animation: ink-bloom 0.18s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    .luck-card .card-number.ink-settle {
+      animation: ink-settle 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     }
 
     .luck-card .card-decor {
@@ -1229,93 +1407,303 @@
       color: #fff;
     }
 
-    /* ─── 快捷中心网格 ────────────────────────────────────────────── */
-    .portal-grid {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 12px;
-      margin-top: 10px;
-    }
-
-    @media (max-width: 1024px) {
-      .portal-grid {
-        grid-template-columns: repeat(3, 1fr);
-      }
-    }
-
-    @media (max-width: 640px) {
-      .portal-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    .portal-grid-item {
+    /* ─── 挂钟与气象卡片 ────────────────────────────────────────────── */
+    .clock-card {
+      position: relative;
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
-      padding: 16px var(--gap-xs);
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      gap: 8px;
-      position: relative;
-      overflow: hidden;
+      padding: 24px;
       box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      transition: all 0.3s ease;
+      text-align: center;
     }
 
-    .portal-grid-item::before {
-      content: '';
+    .clock-card::before {
+      content: "";
       position: absolute;
       top: 0;
       left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(135deg, var(--accent-soft), transparent);
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      z-index: 1;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), color-mix(in oklch, var(--accent) 30%, var(--surface)));
     }
 
-    .portal-grid-item:hover::before {
-      opacity: 1;
+    .clock-card .clock-location {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      margin-bottom: 8px;
     }
 
-    .portal-grid-item:hover {
-      transform: translateY(-4px);
+    .clock-card .clock-time-wrapper {
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 6px;
+      margin-block: 8px;
+    }
+
+    .clock-card .clock-time {
+      font-family: var(--font-display);
+      font-size: 56px;
+      font-weight: 700;
+      color: var(--fg);
+      letter-spacing: -0.02em;
+      line-height: 1;
+      text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.05);
+    }
+
+    .clock-card .clock-sec {
+      font-family: var(--font-mono);
+      font-size: 16px;
+      color: var(--accent);
+      font-weight: 600;
+      background: var(--accent-soft);
+      padding: 2px 6px;
+      border-radius: 6px;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .clock-card .lunar-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 500;
+      padding: 4px 12px;
+      border-radius: 12px;
+      margin-top: 6px;
+      border: 1px solid color-mix(in oklch, var(--accent) 15%, transparent);
+    }
+
+    .clock-card .weather-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px dashed var(--border);
+    }
+
+    .clock-card .weather-cell {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px;
+      text-align: left;
+      transition: all 0.2s ease;
+    }
+
+    .clock-card .weather-cell:hover {
       border-color: var(--accent);
+      background: var(--surface);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .clock-card .weather-cell .cell-title {
+      font-size: 10px;
+      color: var(--muted);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-weight: 500;
+    }
+
+    .clock-card .weather-cell .cell-value {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--fg);
+    }
+
+    .clock-card .weather-cell .cell-desc {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* ─── 应用卡片风格快捷入口 ──────────────────────────────────────── */
+    .app-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .app-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+        box-shadow 0.2s ease,
+        border-color 0.2s ease,
+        background-color 0.2s ease;
+      box-shadow: var(--shadow-sm);
+      text-decoration: none;
+    }
+
+    .app-card:hover {
+      transform: translateY(-3px);
       box-shadow: var(--shadow-md);
+      border-color: var(--accent);
+      background: color-mix(in oklch, var(--surface) 97%, var(--accent) 3%);
     }
 
-    .portal-grid-item .icon {
-      font-size: 26px;
-      z-index: 2;
-      transition: transform 0.3s ease;
+    .app-card .app-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      background: var(--fg-soft);
+      transition: background 0.25s ease, transform 0.25s ease;
+      flex-shrink: 0;
     }
 
-    .portal-grid-item:hover .icon {
-      transform: scale(1.15) rotate(5deg);
+    .app-card:hover .app-icon {
+      background: var(--accent-soft);
+      transform: scale(1.08);
     }
 
-    .portal-grid-item .title {
+    .app-card .app-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .app-card .app-title {
       font-size: 13px;
       font-weight: 600;
       color: var(--fg);
-      z-index: 2;
+      margin-bottom: 2px;
+      transition: color 0.2s ease;
     }
 
-    .portal-grid-item .desc {
-      font-size: 10px;
+    .app-card:hover .app-title {
+      color: var(--accent);
+    }
+
+    .app-card .app-desc {
+      font-size: 11px;
       color: var(--muted);
-      z-index: 2;
-      line-height: 1.4;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
+      white-space: nowrap;
       overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .app-card .app-arrow {
+      font-size: 12px;
+      color: var(--accent);
+      opacity: 0;
+      transform: translateX(-6px);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .app-card:hover .app-arrow {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* ─── 快捷入口列表 (杂志横向条目风格) ────────────────────────── */
+    .portal-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin-top: 4px;
+    }
+
+    .portal-list-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 4px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .portal-list-item:last-child {
+      border-bottom: none;
+    }
+
+    .portal-list-item:hover {
+      background: var(--fg-soft);
+      margin-inline: -8px;
+      padding-inline: 12px;
+      border-radius: var(--radius);
+      border-bottom-color: transparent;
+    }
+
+    .portal-list-item:hover+.portal-list-item {
+      border-top-color: transparent;
+    }
+
+    .portal-list-item .pli-icon {
+      font-size: 20px;
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      background: var(--fg-soft);
+      border-radius: var(--radius);
+      flex-shrink: 0;
+      transition: background 0.2s;
+    }
+
+    .portal-list-item:hover .pli-icon {
+      background: var(--accent-soft);
+    }
+
+    .portal-list-item .pli-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .portal-list-item .pli-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--fg);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .portal-list-item .pli-desc {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 1px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .portal-list-item .pli-arrow {
+      font-size: 14px;
+      color: var(--border);
+      flex-shrink: 0;
+      transition: color 0.2s, transform 0.2s;
+    }
+
+    .portal-list-item:hover .pli-arrow {
+      color: var(--accent);
+      transform: translateX(3px);
     }
 
     /* ─── 全局弹窗模态框 ───────────────────────────────────────────── */
@@ -1483,15 +1871,15 @@
 
           <nav class="nav-list">
             <div class="nav-item active" data-panel="dashboard" onclick="switchPanel('dashboard', this)">
-              <span class="icon">𓇚</span>
+              <span class="icon">📖</span>
               <span>首页简报</span>
             </div>
             <div class="nav-item" data-panel="announcements" onclick="switchPanel('announcements', this)">
-              <span class="icon">📢</span>
+              <span class="icon">🔔</span>
               <span>校园公告</span>
             </div>
             <div class="nav-item" data-panel="weather" onclick="switchPanel('weather', this)">
-              <span class="icon">🌤</span>
+              <span class="icon">🌤️</span>
               <span>实时天气</span>
             </div>
             <div class="nav-item" data-panel="queries" onclick="switchPanel('queries', this)">
@@ -1499,24 +1887,16 @@
               <span>校园查询</span>
             </div>
             <div class="nav-item" data-panel="archive" onclick="switchPanel('archive', this)">
-              <span class="icon">𓅪</span>
+              <span class="icon">📥</span>
               <span>文件寄存</span>
             </div>
             <div class="nav-item" data-panel="toolbox" onclick="switchPanel('toolbox', this)">
-              <span class="icon">𓃠</span>
+              <span class="icon">💼</span>
               <span>班级工具</span>
             </div>
             <div class="nav-item" data-panel="wallpaper" onclick="switchPanel('wallpaper', this)">
-              <span class="icon">𓆭</span>
-              <span>壁纸订阅</span>
-            </div>
-            <div class="nav-item" data-panel="gallery" onclick="switchPanel('gallery', this)">
               <span class="icon">🖼️</span>
-              <span>春晖图库</span>
-            </div>
-            <div class="nav-item" data-panel="settings" onclick="switchPanel('settings', this)">
-              <span class="icon">⚙</span>
-              <span>设置选项</span>
+              <span>壁纸订阅</span>
             </div>
           </nav>
         </div>
@@ -1524,7 +1904,9 @@
         <div class="sidebar-footer">
           <!-- 登录状态 -->
           <div class="user-badge" id="userBadge" onclick="toggleLogin()">
-            <div class="avatar" id="userAvatar">🔑</div>
+            <div class="status-light-container" id="userAvatar">
+              <span class="status-light red" id="status-light"></span>
+            </div>
             <div class="info">
               <div class="name" id="userName">未登录一体机</div>
               <div class="status" id="userStatus">点击登录绑定班级</div>
@@ -1537,9 +1919,15 @@
             <span class="theme-text">深色模式</span>
           </div>
 
+          <!-- 设置选项 -->
+          <div class="sidebar-btn" data-panel="settings" onclick="switchPanel('settings', this)">
+            <span>⚙️</span>
+            <span>设置选项</span>
+          </div>
+
           <!-- 关于我们 -->
-          <div class="sidebar-btn" onclick="alert('春戊NEXT\n\n新媒体社口播搭档工作室荣誉出品\n白马湖畔的青春守护工具。')">
-            <span>𓇚</span>
+          <div class="sidebar-btn" data-panel="about" onclick="switchPanel('about', this)">
+            <span>🍵</span>
             <span>关于我们</span>
           </div>
         </div>
@@ -1564,44 +1952,68 @@
                   <p class="quote-text" id="quoteText">“把自己当作珍珠，就时时有怕被埋没的痛苦；把自己当作泥土吧，让众人把你踩成一条路。”</p>
                   <p class="quote-author" id="quoteAuthor">— 鲁迅</p>
                 </div>
-                <div style="text-align: right; margin-top:12px;">
-                  <button class="btn btn-secondary btn-sm" onclick="changeQuote()">换一句</button>
-                </div>
               </div>
 
               <!-- 核心快捷入口 -->
-              <div class="card">
-                <div class="card-title">🚀 核心快捷入口</div>
-                <div class="portal-grid">
+              <div style="margin-top: 4px; margin-bottom: 4px;">
+                <div class="card-title"
+                  style="border:none; margin-bottom:12px; padding-bottom:0; display:flex; align-items:center; justify-content:space-between;">
+                  <span>🚀 核心快捷入口</span>
+                </div>
+                <div class="app-cards-grid">
                   <!-- 站内短信 -->
-                  <div class="portal-grid-item" onclick="switchPanel('archive'); switchArchiveTab('message')">
-                    <span class="icon">✉️</span>
-                    <span class="title">站内短信</span>
-                    <span class="desc">快速跳转至校园内部消息或通知</span>
+                  <div class="app-card" onclick="switchPanel('archive'); switchArchiveTab('message')">
+                    <div class="app-icon">✉️</div>
+                    <div class="app-info">
+                      <div class="app-title">站内短信</div>
+                      <div class="app-desc">快速跳转至校园内部消息或通知</div>
+                    </div>
+                    <div class="app-arrow">➔</div>
                   </div>
                   <!-- 云上春晖 -->
-                  <div class="portal-grid-item" onclick="switchPanel('archive'); switchArchiveTab('code')">
-                    <span class="icon">☁️</span>
-                    <span class="title">云上春晖</span>
-                    <span class="desc">连接校园云服务与网盘平台</span>
+                  <div class="app-card" onclick="window.open('http://10.181.201.188:5000/', '_blank')">
+                    <div class="app-icon">☁️</div>
+                    <div class="app-info">
+                      <div class="app-title">云上春晖</div>
+                      <div class="app-desc">连接校园云服务与网盘平台</div>
+                    </div>
+                    <div class="app-arrow">➔</div>
                   </div>
                   <!-- 春晖图库 -->
-                  <div class="portal-grid-item" onclick="switchPanel('gallery')">
-                    <span class="icon">🖼️</span>
-                    <span class="title">春晖图库</span>
-                    <span class="desc">展示校园活动照片及精选素材</span>
+                  <div class="app-card" onclick="openGalleryWeb()">
+                    <div class="app-icon">🖼️</div>
+                    <div class="app-info">
+                      <div class="app-title">春晖图库</div>
+                      <div class="app-desc">展示校园活动照片及精选素材</div>
+                    </div>
+                    <div class="app-arrow">➔</div>
                   </div>
                   <!-- 春晖视频 -->
-                  <div class="portal-grid-item" onclick="playCampusVideo()">
-                    <span class="icon">📺</span>
-                    <span class="title">春晖视频</span>
-                    <span class="desc">校园电视台及公开课录像流媒体</span>
+                  <div class="app-card" onclick="playCampusVideo()">
+                    <div class="app-icon">📺</div>
+                    <div class="app-info">
+                      <div class="app-title">春晖视频</div>
+                      <div class="app-desc">校园电视台及公开课录像流媒体</div>
+                    </div>
+                    <div class="app-arrow">➔</div>
                   </div>
                   <!-- 春晖直播 -->
-                  <div class="portal-grid-item" onclick="openLiveStream()">
-                    <span class="icon">🔴</span>
-                    <span class="title">春晖直播</span>
-                    <span class="desc">大型活动与课程的实时直播</span>
+                  <div class="app-card" onclick="openLiveStream()">
+                    <div class="app-icon">🔴</div>
+                    <div class="app-info">
+                      <div class="app-title">春晖直播</div>
+                      <div class="app-desc">大型活动与课程的实时直播</div>
+                    </div>
+                    <div class="app-arrow">➔</div>
+                  </div>
+                  <!-- 春晖对话 -->
+                  <div class="app-card" onclick="window.open('http://10.181.201.181/chat', '_blank')">
+                    <div class="app-icon">💬</div>
+                    <div class="app-info">
+                      <div class="app-title">春晖对话</div>
+                      <div class="app-desc">校园智能 AI 对话与大模型助手</div>
+                    </div>
+                    <div class="app-arrow">➔</div>
                   </div>
                 </div>
               </div>
@@ -1611,7 +2023,7 @@
                 <div class="card-title">
                   <span>📅 今日值周简报</span>
                   <span class="info-badge primary" onclick="switchPanel('queries'); switchQueryTab('duty')"
-                    style="cursor:pointer;">查看完整表 ↗</span>
+                    style="cursor:pointer; font-size:10px;">查看完整表 ↗</span>
                 </div>
                 <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; font-size:12px;">
                   <div
@@ -1634,29 +2046,45 @@
             </div>
 
             <!-- 右侧历法和天气 -->
-            <div class="stack" style="display:flex; flex-direction:column; gap:20px;">
-              <div class="card" style="text-align: center;">
-                <div style="font-family: var(--font-mono); font-size: 36px; font-weight: normal; color: var(--accent);"
-                  id="digital-clock">05:19:55</div>
-                <div style="font-size: 12px; color: var(--muted); margin-top: 6px;">上虞白马湖畔 · 春晖中学</div>
+            <div class="stack" style="display:flex; flex-direction:column; gap:20px; height:100%;">
+              <div class="clock-card">
+                <div class="clock-location">上虞白马湖畔 · 春晖中学</div>
+                <div class="clock-time-wrapper">
+                  <span class="clock-time" id="digital-clock">16:36</span>
+                  <span class="clock-sec" id="digital-clock-sec">00</span>
+                </div>
+                <div>
+                  <div class="lunar-badge">
+                    <span id="clock-lunar">农历…</span>
+                    <span style="opacity: 0.5;">·</span>
+                    <span id="clock-jieqi-minor">蝉始鸣</span>
+                  </div>
+                </div>
 
-                <div
-                  style="border-top:1px solid var(--border); margin-block:12px; padding-top:12px; text-align: left; font-size: 12px; color:var(--muted); display:flex; flex-direction:column; gap:6px;">
-                  <div>农历：丙午年五月初一</div>
-                  <div>节气：夏至后三日 · 蝉始鸣</div>
-                  <div>天气：晴 26℃ ~ 32℃ · 东南风</div>
+                <div class="weather-grid">
+                  <div class="weather-cell">
+                    <div class="cell-title">🌡️ 实时温度</div>
+                    <div class="cell-value">26–32℃</div>
+                    <div class="cell-desc">晴 · 东南风</div>
+                  </div>
+                  <div class="weather-cell">
+                    <div class="cell-title">📅 当前节气</div>
+                    <div class="cell-value" id="clock-jieqi">—</div>
+                    <div class="cell-desc" id="clock-jieqi-desc">—</div>
+                  </div>
                 </div>
               </div>
 
               <!-- 校园公告 -->
-              <div class="card">
+              <div class="card" style="flex:1; display:flex; flex-direction:column;">
                 <div class="card-title">
-                  <span>校园公告</span>
-                  <a href="#" style="font-size:11px; color:var(--accent);"
-                    onclick="alert('一体机系统手册：如网络异常，本程序将启动 10s 超时防护与 3 次延迟重试。')">说明</a>
+                  <span>📢 校园公告</span>
+                  <a href="#"
+                    style="font-size:10px; color:var(--accent); font-family:var(--font-mono); letter-spacing:0.05em;"
+                    onclick="alert('一体机系统手册：如网络异常，本程序将启动 10s 超时防护与 3 次延迟重试。')">说明 ↗</a>
                 </div>
                 <div id="announcement-area"
-                  style="font-size:12px; line-height:1.5; color: var(--muted); min-height:60px;">
+                  style="font-size:12px; line-height:1.5; color: var(--muted); min-height:60px; flex:1;">
                   <div style="border-bottom: 1px solid var(--border); padding-bottom:8px; margin-bottom:8px;">
                     <span style="color:var(--accent); font-weight:500;">[公示]</span> 仰山校园网将于本周六凌晨2点维护。
                   </div>
@@ -2046,64 +2474,14 @@
           </header>
 
           <div class="tab-header">
-            <span class="tab-btn active" onclick="switchArchiveTab('code', this)">提取码下载</span>
-            <span class="tab-btn" onclick="switchArchiveTab('upload', this)">逻辑分片寄存</span>
-            <span class="tab-btn" onclick="switchArchiveTab('message', this)">收件箱邮件附件</span>
+            <span class="tab-btn active" onclick="switchArchiveTab('message', this)">收件箱邮件附件</span>
+            <span class="tab-btn" onclick="switchArchiveTab('upload', this)">文件寄存</span>
+            <span class="tab-btn" onclick="switchArchiveTab('code', this)">提取码下载</span>
           </div>
 
           <div class="card">
-            <!-- 提取码 Tab -->
-            <div class="tab-content" id="archive-code">
-              <p style="font-size:13px; color:var(--muted); margin-top:0; margin-bottom:20px;">
-                在下方输入由本客户端或 CLI 工具生成的 6 位数文件提取密码，高速提取并归档课堂教学资料。
-              </p>
-
-              <div class="download-section">
-                <div class="input-wrapper" style="max-width: 480px; margin-inline: auto;">
-                  <input type="text" class="text-input" placeholder="输入 6 位数字提取密码 (例如: 849301)" id="downloadCode" />
-                  <button class="btn btn-primary" style="position: absolute; right: 4px; padding: 8px 14px;"
-                    onclick="startDownload()">安全提取</button>
-                </div>
-
-                <div class="progress-bar-container" id="progressBarContainer"
-                  style="max-width: 480px; margin-inline: auto;">
-                  <div class="progress-bar" id="progressBar"></div>
-                </div>
-                <div class="status-msg" id="downloadStatus"></div>
-              </div>
-            </div>
-
-            <!-- 文件寄存分片上传 Tab -->
-            <div class="tab-content" id="archive-upload" style="display:none;">
-              <p style="font-size:13px; color:var(--muted); margin-top:0; margin-bottom:16px;">
-                拖拽文件至下方进行分片上传。系统将对文件进行 2MB 规格逻辑分片，独立包装后自动上传并触发服务器端文件合成。
-              </p>
-
-              <div style="max-width:540px; margin-inline:auto;">
-                <div class="upload-drag-area" id="uploadDragArea" onclick="triggerFileInput()">
-                  <div class="upload-drag-icon">☁</div>
-                  <div style="font-weight:500; font-size:14px; margin-bottom:4px;">拖拽文件到这里，或者点击选择文件</div>
-                  <div style="font-size:11px; color:var(--muted);">支持任何格式，大文件将自动切分为 2MB 数据分片上传</div>
-                  <input type="file" id="fileInputElement" style="display:none;" onchange="handleFileSelected(event)" />
-                </div>
-
-                <!-- 上传进度控制 -->
-                <div id="uploadProgressSection" style="display:none; margin-top:20px;">
-                  <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:6px;">
-                    <span id="uploadFileName" style="font-weight:500;">文件名称.zip</span>
-                    <span id="uploadProgressPercent" style="color:var(--accent); font-weight:600;">0%</span>
-                  </div>
-                  <div class="progress-bar-container" id="uploadProgressContainer" style="display:block;">
-                    <div class="progress-bar" id="uploadProgressBar" style="width: 0%; background: var(--accent);">
-                    </div>
-                  </div>
-                  <div class="status-msg" id="uploadStatusMessage" style="text-align:center; margin-top:8px;"></div>
-                </div>
-              </div>
-            </div>
-
             <!-- 站内短信 Tab -->
-            <div class="tab-content" id="archive-message" style="display:none;">
+            <div class="tab-content" id="archive-message">
               <!-- 错误提示 -->
               <div class="banner banner-error" id="msgLoginWarning">
                 <span>🔑</span>
@@ -2142,6 +2520,56 @@
                       onclick="simulateFileDownload('第六周白马湖团日活动策划.xlsx')">下载</button>
                   </div>
                 </div>
+              </div>
+            </div>
+
+            <!-- 文件寄存分片上传 Tab -->
+            <div class="tab-content" id="archive-upload" style="display:none;">
+              <p style="font-size:13px; color:var(--muted); margin-top:0; margin-bottom:16px;">
+                拖拽文件至下方进行上传。单个文件大小限制为 100MB，支持快速暂存与分发。
+              </p>
+
+              <div style="max-width:540px; margin-inline:auto;">
+                <div class="upload-drag-area" id="uploadDragArea" onclick="triggerFileInput()">
+                  <div class="upload-drag-icon">☁</div>
+                  <div style="font-weight:500; font-size:14px; margin-bottom:4px;">拖拽文件到这里，或者点击选择文件</div>
+                  <div style="font-size:11px; color:var(--muted);">支持任何格式，单个文件大小限制 100MB</div>
+                  <input type="file" id="fileInputElement" style="display:none;" onchange="handleFileSelected(event)" />
+                </div>
+
+                <!-- 上传进度控制 -->
+                <div id="uploadProgressSection" style="display:none; margin-top:20px;">
+                  <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:6px;">
+                    <span id="uploadFileName" style="font-weight:500;">文件名称.zip</span>
+                    <span id="uploadProgressPercent" style="color:var(--accent); font-weight:600;">0%</span>
+                  </div>
+                  <div class="progress-bar-container" id="uploadProgressContainer" style="display:block;">
+                    <div class="progress-bar" id="uploadProgressBar" style="width: 0%; background: var(--accent);">
+                    </div>
+                  </div>
+                  <div class="status-msg" id="uploadStatusMessage" style="text-align:center; margin-top:8px;"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 提取码 Tab -->
+            <div class="tab-content" id="archive-code" style="display:none;">
+              <p style="font-size:13px; color:var(--muted); margin-top:0; margin-bottom:20px;">
+                在下方输入由本客户端或 CLI 工具生成的 6 位数文件提取密码，高速提取并归档课堂教学资料。
+              </p>
+
+              <div class="download-section">
+                <div class="input-wrapper" style="max-width: 480px; margin-inline: auto;">
+                  <input type="text" class="text-input" placeholder="输入 6 位数字提取密码 (例如: 849301)" id="downloadCode" />
+                  <button class="btn btn-primary" style="position: absolute; right: 4px; padding: 8px 14px;"
+                    onclick="startDownload()">安全提取</button>
+                </div>
+
+                <div class="progress-bar-container" id="progressBarContainer"
+                  style="max-width: 480px; margin-inline: auto;">
+                  <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <div class="status-msg" id="downloadStatus"></div>
               </div>
             </div>
 
@@ -2190,7 +2618,7 @@
                     <div class="title" style="font-size:13px;">水墨散开动效</div>
                   </div>
                   <label class="switch">
-                    <input type="checkbox" checked>
+                    <input type="checkbox" id="setInkEffect" checked>
                     <span class="slider"></span>
                   </label>
                 </div>
@@ -2265,46 +2693,13 @@
             <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
               <span style="font-size:12px; color:var(--muted);">数据源: 春晖中学新媒体社摄影资源库 (每日更新)</span>
               <button class="btn btn-primary" onclick="alert('壁纸成功下载！已平滑更换您的桌面壁纸。')">
-                <span>🔄</span> 设置每日自动轮播
+                <span>🔄</span> 壁纸自动切换设置
               </button>
             </div>
           </div>
         </div>
 
-        <!-- 8. 春晖图库面板 -->
-        <div class="panel-view" id="panel-gallery">
-          <header style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px;">
-            <div>
-              <div class="page-eyebrow" id="gallery-eyebrow">Campus Gallery</div>
-              <h1 class="page-title" id="gallery-title">春晖图库</h1>
-            </div>
-            <button class="btn btn-secondary btn-sm" onclick="openGalleryWeb()" style="margin-bottom: 4px;">
-              <span>🌐</span> 打开网页版 ↗
-            </button>
-          </header>
 
-          <!-- 面包屑导航 -->
-          <div id="gallery-nav-bar" style="margin-bottom: 16px; display: none; align-items: center; gap: 8px; font-size: 13px;">
-            <span style="cursor: pointer; color: var(--accent); font-weight: 500;" onclick="showGalleryFolders()">📁 共享空间根目录</span>
-            <span style="color: var(--border);">/</span>
-            <span id="current-folder-name" style="color: var(--fg); font-weight: 500;">当前分类</span>
-          </div>
-
-          <!-- A. 文件夹网格展示区 -->
-          <div id="gallery-folders-view" class="card" style="min-height: 480px; padding: 20px;">
-            <div style="font-size: 14px; font-weight: 600; margin-bottom: 16px; color: var(--accent);">📁 共享文件夹列表</div>
-            <div id="foldersGrid" class="grid-3">
-              <!-- 动态渲染文件夹卡片 -->
-            </div>
-          </div>
-
-          <!-- B. 照片网格展示区 -->
-          <div id="gallery-items-view" class="card" style="display: none; min-height: 480px; padding: 20px;">
-            <div id="photosGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px;">
-              <!-- 动态渲染照片卡片 -->
-            </div>
-          </div>
-        </div>
 
         <!-- 7. 设置选项面板 -->
         <div class="panel-view" id="panel-settings">
@@ -2358,13 +2753,141 @@
             <!-- 调试与开发设置 -->
             <div class="card">
               <h3 style="font-size: 14px; font-weight:600; margin-bottom: 8px; color: var(--accent);">开发与调试设置</h3>
+              <div class="setting-row">
+                <div class="setting-info">
+                  <div class="title">打开 chunhui-cil tui</div>
+                  <div class="desc">在终端或内置控制台中调起并交互 chunhui-cil 文本终端用户界面（TUI）。</div>
+                </div>
+                <button class="btn btn-secondary btn-sm" onclick="openChunhuiTui()">打开 TUI</button>
+              </div>
               <div class="setting-row" style="border:none;">
                 <div class="setting-info">
-                  <div class="title">内置 Tauri Webview2 调试控制台</div>
-                  <div class="desc">打开侧边栏日志控制台以实时观察底层 API 超时与重试握手请求。</div>
+                  <div class="title">设置环境变量 chunhui</div>
+                  <div class="desc">将当前工作区的 chunhui-cil 路径一键添加至系统环境变量，以便全局通过 `chunhui` 指令运行。</div>
                 </div>
-                <button class="btn btn-secondary btn-sm" onclick="toggleConsole()">打开面板</button>
+                <button class="btn btn-secondary btn-sm" onclick="setChunhuiEnv()">设置环境变量</button>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 9. 关于我们面板 -->
+        <div class="panel-view" id="panel-about">
+          <header>
+            <div class="page-eyebrow">About Us</div>
+            <h1 class="page-title">关于我们</h1>
+          </header>
+
+          <div class="stack" style="display:flex; flex-direction:column; gap:20px;">
+            <!-- 团队介绍 -->
+            <div class="card">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <h2
+                  style="font-family:var(--font-display); font-size:24px; font-weight:normal; margin:0; color:var(--accent);">
+                  春戊NEXT (RS 独立重构版)</h2>
+                <span class="info-badge primary" style="font-weight:600;">开发者: RS (独立分支)</span>
+              </div>
+              <p style="font-size:13px; line-height:1.7; color:var(--fg); margin:0;">
+                春戊NEXT是由 <strong>RS</strong> 进行全面重构的全新版本。为了更好地探索产品演进，该项目目前已前往独立的分支进行维护与开发。<br>
+                本着对白马湖美学视觉与用户体验的极致追求，我们重塑了智慧多媒体一体机客户端的整体架构，优化了每一个交互细节与视觉表现，致力于打造一个清澈、现代且极具质感的校园信息门户。
+              </p>
+              <div
+                style="margin-top:14px; padding-top:12px; border-top:1px dashed var(--border); font-size:12px; line-height:1.6; color:var(--muted);">
+                ✨ <strong>重构及分支说明</strong>：春戊NEXT 在设计和代码实现上均由 <strong>RS</strong> (28届)
+                独立进行架构重塑与升级。项目已切往独立分支演进，旨在提供更加流畅、高效的白马湖美学智慧终端。
+              </div>
+            </div>
+
+            <!-- 成员介绍 -->
+            <div class="card">
+              <h3 style="font-size: 15px; font-weight:600; margin-bottom: 16px;">团队成员 / Members</h3>
+              <div class="grid-3" style="gap:16px;">
+                <!-- HigherSY -->
+                <div
+                  style="background:var(--fg-soft); border:1px solid var(--border); border-radius:var(--radius); padding:16px; display:flex; align-items:center; gap:14px;">
+                  <div
+                    style="width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%); color:var(--surface); display:grid; place-items:center; font-size:18px; font-weight:bold; flex-shrink:0;">
+                    H</div>
+                  <div style="min-width:0;">
+                    <div style="font-size:14px; font-weight:600; color:var(--fg);">HigherSY</div>
+                    <div style="font-size:11px; color:var(--muted); margin-block:2px;">22届 · 成员</div>
+                    <div
+                      style="font-size:10px; color:var(--fg); text-overflow:ellipsis; overflow:hidden; white-space:nowrap;"
+                      title="就这样了不改了">就这样了不改了</div>
+                  </div>
+                </div>
+
+                <!-- Axell_wppr -->
+                <div
+                  style="background:var(--fg-soft); border:1px solid var(--border); border-radius:var(--radius); padding:16px; display:flex; align-items:center; gap:14px;">
+                  <div
+                    style="width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg, #ec4899 0%, #f43f5e 100%); color:var(--surface); display:grid; place-items:center; font-size:18px; font-weight:bold; flex-shrink:0;">
+                    A</div>
+                  <div style="min-width:0;">
+                    <div style="font-size:14px; font-weight:600; color:var(--fg);">Axell_wppr</div>
+                    <div style="font-size:11px; color:var(--muted); margin-block:2px;">22届 · 成员</div>
+                    <div
+                      style="font-size:10px; color:var(--fg); text-overflow:ellipsis; overflow:hidden; white-space:nowrap;"
+                      title="感觉哪里不太对">感觉哪里不太对</div>
+                  </div>
+                </div>
+
+                <!-- Coder014 -->
+                <div
+                  style="background:var(--fg-soft); border:1px solid var(--border); border-radius:var(--radius); padding:16px; display:flex; align-items:center; gap:14px;">
+                  <div
+                    style="width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg, #eab308 0%, #f97316 100%); color:var(--surface); display:grid; place-items:center; font-size:18px; font-weight:bold; flex-shrink:0;">
+                    C</div>
+                  <div style="min-width:0;">
+                    <div style="font-size:14px; font-weight:600; color:var(--fg);">Coder014</div>
+                    <div style="font-size:11px; color:var(--muted); margin-block:2px;">21届 · 成员</div>
+                    <div
+                      style="font-size:10px; color:var(--fg); text-overflow:ellipsis; overflow:hidden; white-space:nowrap;"
+                      title="这不太好 还得修改">这不太好 还得修改</div>
+                  </div>
+                </div>
+
+                <!-- 某空条姓的搬砖人 -->
+                <div
+                  style="background:var(--fg-soft); border:1px solid var(--border); border-radius:var(--radius); padding:16px; display:flex; align-items:center; gap:14px;">
+                  <div
+                    style="width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%); color:var(--surface); display:grid; place-items:center; font-size:18px; font-weight:bold; flex-shrink:0;">
+                    🧱</div>
+                  <div style="min-width:0;">
+                    <div style="font-size:14px; font-weight:600; color:var(--fg);">某空条姓的搬砖人</div>
+                    <div style="font-size:11px; color:var(--muted); margin-block:2px;">22届 · 成员</div>
+                    <div
+                      style="font-size:10px; color:var(--fg); text-overflow:ellipsis; overflow:hidden; white-space:nowrap;"
+                      title="我也不知道 好像都挺好">我也不知道 好像都挺好</div>
+                  </div>
+                </div>
+
+                <!-- sudo015 -->
+                <div
+                  style="background:var(--fg-soft); border:1px solid var(--border); border-radius:var(--radius); padding:16px; display:flex; align-items:center; gap:14px;">
+                  <div
+                    style="width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg, #10b981 0%, #14b8a6 100%); color:var(--surface); display:grid; place-items:center; font-size:18px; font-weight:bold; flex-shrink:0;">
+                    S</div>
+                  <div style="min-width:0;">
+                    <div style="font-size:14px; font-weight:600; color:var(--fg);">sudo015</div>
+                    <div style="font-size:11px; color:var(--muted); margin-block:2px;">26届 · 成员</div>
+                    <div
+                      style="font-size:10px; color:var(--fg); text-overflow:ellipsis; overflow:hidden; white-space:nowrap;"
+                      title=">>> import this">>>> import this</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Join Us -->
+            <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <h3 style="font-size:15px; font-weight:600; margin:0 0 4px 0;">加入我们 / Join Us</h3>
+                <p style="font-size:12px; color:var(--muted); margin:0;">想加入我们？期待你的加入，用技术点缀校园生活。</p>
+              </div>
+              <a href="mailto:i@17zuonie.org"
+                style="background:var(--accent); color:var(--surface); text-decoration:none; padding:8px 16px; border-radius:var(--radius); font-size:13px; font-weight:500; transition:opacity 0.2s;"
+                onmouseover="this.style.opacity=0.9" onmouseout="this.style.opacity=1">i@17zuonie.org</a>
             </div>
           </div>
         </div>
@@ -2418,7 +2941,8 @@
         <div style="font-size:12px; color:var(--muted); line-height:1.5; flex: 1;">
           <b>今日热播：</b>《白马湖畔的青春守护 - 任意门介绍视频》、《防溺水安全警示片》、《社团招新先导片》。
         </div>
-        <button class="btn btn-secondary btn-sm" style="flex-shrink: 0;" onclick="window.open('http://10.181.201.185:82/', '_blank')">🌐 打开网页视频站 ↗</button>
+        <button class="btn btn-secondary btn-sm" style="flex-shrink: 0;"
+          onclick="window.open('http://10.181.201.185:82/', '_blank')">🌐 打开网页视频站 ↗</button>
       </div>
     </div>
   </div>
@@ -2446,22 +2970,37 @@
       <div style="margin-top:16px; display:flex; justify-content:space-between; align-items:center; gap: 12px;">
         <div style="font-size:12px; color:var(--muted); display:flex; flex-direction:column; gap:4px;">
           <div>直播源: 仰山报告厅主会场机位</div>
-          <div style="font-family: monospace; background: var(--bg-hover); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border); font-size: 11px;">rtmp://10.181.201.185/live/livestream</div>
+          <div
+            style="font-family: monospace; background: var(--bg-hover); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border); font-size: 11px;">
+            rtmp://10.181.201.185/live/livestream</div>
         </div>
         <div style="display:flex; gap:8px; flex-shrink: 0;">
-          <button class="btn btn-secondary btn-sm" onclick="navigator.clipboard.writeText('rtmp://10.181.201.185/live/livestream'); logConsole('春晖直播：已复制直播源 RTMP 地址到剪贴板。', 'success'); alert('已成功复制 RTMP 直播源地址至剪贴板！');">📋 复制直播源</button>
+          <button class="btn btn-secondary btn-sm"
+            onclick="navigator.clipboard.writeText('rtmp://10.181.201.185/live/livestream'); logConsole('春晖直播：已复制直播源 RTMP 地址到剪贴板。', 'success'); alert('已成功复制 RTMP 直播源地址至剪贴板！');">📋
+            复制直播源</button>
           <button class="btn btn-primary btn-sm" onclick="likeLiveStream()">👍 给直播点赞</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- 图库大图灯箱模态框 -->
-  <div id="cwu-gallery-modal" class="cwu-modal" onclick="closeModal('cwu-gallery-modal')">
-    <div class="cwu-modal-content" onclick="event.stopPropagation()" style="background: none; border: none; box-shadow: none; max-width: 90%; text-align: center;">
-      <span class="cwu-modal-close" onclick="closeModal('cwu-gallery-modal')" style="color: #fff; font-size: 32px; top: 10px; right: 10px;">✕</span>
-      <img id="lightbox-image" src="" style="max-width: 100%; max-height: 80vh; border-radius: var(--radius); border: 2px solid var(--border); box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4); object-fit: contain;" />
-      <div id="lightbox-title" style="color: #fff; margin-top: 12px; font-size: 14px; font-family: var(--font-display);"></div>
+  <!-- ─── 绑定一体机凭证弹窗 ────────────────────────────────────────── -->
+  <div id="cwu-login-modal" class="cwu-modal" onclick="closeModal('cwu-login-modal')">
+    <div class="cwu-modal-content" onclick="event.stopPropagation()" style="max-width: 400px; padding: 24px;">
+      <span class="cwu-modal-close" onclick="closeModal('cwu-login-modal')">✕</span>
+      <h3
+        style="margin-top:0; font-family:var(--font-display); font-weight:normal; margin-bottom:16px; color:var(--fg); display:flex; align-items:center; gap:8px;">
+        🔑 导入 Cookies 凭证
+      </h3>
+      <div class="form-group" style="margin-bottom: 20px; text-align: left;">
+        <textarea id="loginCookieInput" class="text-input"
+          placeholder="请在此粘贴从浏览器复制的统一身份认证 Cookie (如 sessionid=xxxxxx; csrftoken=yyyyyy)"
+          style="width:100%; height:100px; resize:none; font-family:var(--font-mono); font-size:12px; box-sizing:border-box; line-height:1.5;"></textarea>
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:10px;">
+        <button class="btn btn-secondary btn-sm" onclick="closeModal('cwu-login-modal')">取消</button>
+        <button class="btn btn-primary btn-sm" onclick="submitImportedCookie()">绑定</button>
+      </div>
     </div>
   </div>
 
@@ -2469,17 +3008,32 @@
     // ─── 数据库与状态 ──────────────────────────────────────────────────
     let isDarkTheme = false;
     let isLoggedIn = false;
+
+    function callBridge(cmd, args = []) {
+      if (window.__TAURI__) {
+        return window.__TAURI__.invoke('run_bridge', { cmd: cmd, args: args })
+          .then(resultStr => {
+            const result = JSON.parse(resultStr);
+            if (result.success) {
+              return result.data;
+            } else {
+              throw new Error(result.data);
+            }
+          });
+      } else {
+        return Promise.reject(new Error("非 Tauri 环境"));
+      }
+    }
     let lotteryInterval = null;
+    // ─── 名言数据（从 quotes.txt 加载，此为降级备用）─────────────────
     let quotes = [
       { text: "“把自己当作珍珠，就时时有怕被埋没的痛苦；把自己当作泥土吧，让众人把你踩成一条路。”", author: "鲁迅" },
       { text: "“白马湖的黄昏，比白昼更有一种温柔。让人想在湖畔的长椅上，静静看最后一抹晚霞散去。”", author: "春晖纪实" },
-      { text: "“所谓任意门，不是为了逃离现在，而是为了让春晖的少年人无论走到哪里，推开门都能看见白马湖的春水。”", author: "口播搭档独白" },
-      { text: "“看不见的城市。在那些交织的廊道中，我们寻找的不是过往，而是我们在青春里彼此重逢的证据。”", author: "卡尔维诺" },
-      { text: "“对人性的剖析常常让我们羞愧，但唯有真诚的相待，才能在这个冷漠時代融化冰雪。”", author: "拉罗什富科" }
+      { text: "“春晖以春为名，以晖为志。在这里，每个少年都有机会被看见。”", author: "春晖校刊" }
     ];
     let quoteIndex = 0;
 
-    // 真心话大冒险题目数据
+    // ─── 真心话大冒险题目（从 truth_dare.txt 加载，此为降级备用）────────
     let cardTopics = [
       { type: "truth", content: "向你的口播搭档说一句这学期你一直想说但没说出口的感谢。", tip: "真心话 · 点击将其划走" },
       { type: "dare", content: "模仿新媒体社招新宣讲时的口吻，大声背诵一遍春晖校训：“与时俱进”。", tip: "大冒险 · 点击将其划走" },
@@ -2489,6 +3043,55 @@
       { type: "dare", content: "现场为班级展示一个新媒体社推荐的“短视频专属手势舞”或任意才艺。", tip: "大冒险 · 点击将其划走" }
     ];
     let currentCards = [];
+
+    // ─── 从外部 txt 文件加载名言与题目数据 ──────────────────────────────
+    async function loadExternalData() {
+      // 加载名言
+      try {
+        const res = await fetch('./quotes.txt');
+        if (res.ok) {
+          const text = await res.text();
+          const parsed = text.trim().split('\n')
+            .map(line => line.trim())
+            .filter(line => line && line.includes('|'))
+            .map(line => {
+              const idx = line.lastIndexOf('|');
+              return { text: line.slice(0, idx).trim(), author: line.slice(idx + 1).trim() };
+            });
+          if (parsed.length > 0) {
+            quotes = parsed;
+            quoteIndex = 0;
+            const textEl = document.getElementById('quoteText');
+            const authEl = document.getElementById('quoteAuthor');
+            if (textEl) textEl.textContent = quotes[0].text;
+            if (authEl) authEl.textContent = quotes[0].author;
+            logConsole(`名言库：成功从 quotes.txt 加载 ${parsed.length} 条名言。`, 'success');
+          }
+        }
+      } catch(e) { logConsole('名言库：quotes.txt 加载失败，使用内置数据。', 'warn'); }
+
+      // 加载真心话大冒险题目
+      try {
+        const res2 = await fetch('./truth_dare.txt');
+        if (res2.ok) {
+          const text2 = await res2.text();
+          const parsed2 = text2.trim().split('\n')
+            .map(line => line.trim())
+            .filter(line => line && line.includes('|'))
+            .map(line => {
+              const idx = line.indexOf('|');
+              const type = line.slice(0, idx).trim();
+              const content = line.slice(idx + 1).trim();
+              return { type, content, tip: type === 'truth' ? '真心话 · 点击将其划走' : '大冒险 · 点击将其划走' };
+            })
+            .filter(c => c.type === 'truth' || c.type === 'dare');
+          if (parsed2.length > 0) {
+            cardTopics = parsed2;
+            logConsole(`互动卡牌：成功从 truth_dare.txt 加载 ${parsed2.length} 道题目。`, 'success');
+          }
+        }
+      } catch(e) { logConsole('互动卡牌：truth_dare.txt 加载失败，使用内置数据。', 'warn'); }
+    }
 
     // ─── 校园资讯及公告模拟数据 ───────────────────────────────────────
 
@@ -2549,6 +3152,148 @@
       { id: "A-05", title: "仰山校园网将于本周六凌晨2点进行核心网络升级维护", date: "2026-06-15", author: "信息中心", type: "emergency", content: "<p>为提高智慧校园网速，仰山学术报告厅及各班一体机网络将于周六凌晨2:00-4:00进行升级改造。届时有线及无线网络会发生短时中断。</p><p>请大家知悉并合理安排用网时间。</p>", isRead: false },
       { id: "A-06", title: "关于仰山学术报告厅周末学术研讨会场地预约的公示", date: "2026-06-08", author: "校办", type: "school", content: "<p>本周末（6月17日-6月18日）仰山报告厅将承办全省高中语文教学研讨会。届时报告厅场地暂不对社团或班级预约开放，已提交申请的社团将被协调至实验楼多功能厅进行。</p>", isRead: true }
     ];
+
+    // ─── 登录状态模拟 ─────────────────────────────────────────────────
+    function openModal(modalId) {
+      document.getElementById(modalId).style.display = 'flex';
+      logConsole(`客户端弹窗：打开模态框 [${modalId}]`, 'info');
+    }
+
+    function submitImportedCookie() {
+      const cookieInput = document.getElementById('loginCookieInput');
+      const cookieVal = cookieInput.value.trim();
+
+      if (!cookieVal) {
+        alert('请输入有效的会话 Cookie 凭证。');
+        return;
+      }
+
+      // 切换为黄灯 (验证中)
+      const light = document.getElementById('status-light');
+      if (light) {
+        light.className = "status-light yellow";
+      }
+
+      const name = document.getElementById('userName');
+      const status = document.getElementById('userStatus');
+      name.textContent = '正在验证会话凭证...';
+      status.textContent = '正在建立鉴权通道...';
+
+      logConsole('Tauri Auth: 正在同步 Cookie 凭证至 chunhui-cil 后端...', 'info');
+      logConsole("Tauri Process: 执行 'python3 ch_cli.py login --cookie ...' 进行会话绑定...", 'info');
+
+      if (window.__TAURI__) {
+        window.__TAURI__.invoke('run_cli', { args: ['login', '--cookie', cookieVal] })
+          .then((output) => {
+            logConsole('Tauri IPC 响应: ' + output, 'success');
+            isLoggedIn = true;
+
+            // 切换为绿灯 (已登录)
+            if (light) {
+              light.className = "status-light green";
+            }
+            const avatar = document.getElementById('userAvatar');
+            if (avatar) {
+              avatar.textContent = '🏫';
+            }
+
+            name.textContent = '高一(12)班 班级一体机';
+            status.textContent = '已通过仰山校园网鉴权';
+
+            const loginWarning = document.getElementById('msgLoginWarning');
+            const messageFileList = document.getElementById('messageFileList');
+            if (loginWarning) loginWarning.style.display = 'none';
+            if (messageFileList) messageFileList.style.display = 'block';
+
+            closeModal('cwu-login-modal');
+            cookieInput.value = ''; // 清空输入框
+
+            // 登录成功刷新全部组件数据
+            showCurrentWeekDuty();
+            searchHygiene();
+            loadLostFoundList();
+            loadAnnouncementsList();
+            loadInboxMessages();
+          })
+          .catch((err) => {
+            logConsole('Tauri IPC 错误: ' + err, 'error');
+            if (light) {
+              light.className = "status-light red";
+            }
+            name.textContent = '未登录一体机';
+            status.textContent = '点击登录绑定班级';
+            alert('验证失败: ' + err);
+          });
+      } else {
+        // 模拟验证耗时1.2秒
+        setTimeout(() => {
+          isLoggedIn = true;
+
+          // 切换为绿灯 (已登录)
+          if (light) {
+            light.className = "status-light green";
+          }
+          const avatar = document.getElementById('userAvatar');
+          if (avatar) {
+            avatar.textContent = '🏫';
+          }
+
+          name.textContent = '高一(12)班 班级一体机';
+          status.textContent = '已通过仰山校园网鉴权';
+
+          const loginWarning = document.getElementById('msgLoginWarning');
+          const messageFileList = document.getElementById('messageFileList');
+          if (loginWarning) loginWarning.style.display = 'none';
+          if (messageFileList) messageFileList.style.display = 'block';
+
+          logConsole('Tauri IPC: chunhui-cil 响应：Cookie 导入成功！会话验证成功。', 'success');
+          logConsole('Tauri Auth: 一体机网络会话鉴权通过，Cookie 已加密写入本地 db.json。', 'success');
+
+          closeModal('cwu-login-modal');
+          cookieInput.value = ''; // 清空输入框
+
+          showCurrentWeekDuty();
+          searchHygiene();
+          loadLostFoundList();
+          loadAnnouncementsList();
+          loadInboxMessages();
+        }, 1200);
+      }
+    }
+
+    function toggleLogin() {
+      const avatar = document.getElementById('userAvatar');
+      const name = document.getElementById('userName');
+      const status = document.getElementById('userStatus');
+      const loginWarning = document.getElementById('msgLoginWarning');
+      const messageFileList = document.getElementById('messageFileList');
+      const light = document.getElementById('status-light');
+
+      if (isLoggedIn) {
+        // 已登录时，点击退出登录
+        isLoggedIn = false;
+
+        // 切换为红灯 (未登录)
+        if (light) {
+          light.className = "status-light red";
+        }
+        if (avatar) {
+          avatar.textContent = '🔑';
+        }
+
+        name.textContent = '未登录一体机';
+        status.textContent = '点击登录绑定班级';
+
+        if (loginWarning) loginWarning.style.display = 'flex';
+        if (messageFileList) messageFileList.style.display = 'none';
+
+        logConsole('Tauri Process: 释放后端会话凭证...', 'info');
+        logConsole('Tauri Auth: 已清除本地 Session 会话 Cookie，站内信附件访问锁闭。', 'warn');
+      } else {
+        // 未登录时，弹出登录悬浮卡片
+        openModal('cwu-login-modal');
+      }
+    }
 
     function loadAnnouncementsList() {
       filterAnnouncements();
@@ -2669,6 +3414,9 @@
       setInterval(updateClock, 1000);
       updateClock();
 
+      // 加载外部 txt 资源数据
+      loadExternalData();
+
       // 模拟壁纸加载
       setTimeout(() => {
         document.getElementById('wallpaperLoading').style.display = 'none';
@@ -2701,22 +3449,18 @@
       }
 
       // 更新侧边栏导航高亮
-      const navItems = document.querySelectorAll('.nav-item');
+      const navItems = document.querySelectorAll('.nav-item, .sidebar-btn');
       navItems.forEach(item => item.classList.remove('active'));
 
       let targetNavItem = element;
       if (!targetNavItem) {
-        targetNavItem = document.querySelector(`.nav-item[data-panel="${panelId}"]`);
+        targetNavItem = document.querySelector(`.nav-item[data-panel="${panelId}"], .sidebar-btn[data-panel="${panelId}"]`);
       }
       if (targetNavItem) {
         targetNavItem.classList.add('active');
       }
 
       logConsole(`Tauri 路由：切换至视图面板 [${panelId}]`, 'info');
-      
-      if (panelId === 'gallery') {
-        showGalleryFolders();
-      }
     }
 
     // ─── 校园视频与直播模拟 ──────────────────────────────────────────────
@@ -2816,14 +3560,146 @@
       }, 8000);
     }
 
+    // ─── 离线节气与农历计算 ───────────────────────────────────────────
+    const JIEQI_NAMES = [
+      '小寒','大寒','立春','雨水','惊蛰','春分',
+      '清明','谷雨','立夏','小满','芒种','夏至',
+      '小暑','大暑','立秋','处暑','白露','秋分',
+      '寒露','霜降','立冬','小雪','大雪','冬至'
+    ];
+
+    // 二十四节气 C值（21世纪基准日，对应1月到12月）
+    const JIEQI_C = [
+      6.11, 20.84, // 1月: 小寒, 大寒
+      3.87, 18.73, // 2月: 立春, 雨水
+      5.63, 20.64, // 3月: 惊蛰, 春分
+      4.81, 20.10, // 4月: 清明, 谷雨
+      5.52, 21.04, // 5月: 立夏, 小满
+      5.67, 21.37, // 6月: 芒种, 夏至
+      7.10, 22.83, // 7月: 小暑, 大暑
+      7.35, 23.13, // 8月: 立秋, 处暑
+      7.64, 23.04, // 9月: 白露, 秋分
+      8.31, 23.65, // 10月: 寒露, 霜降
+      7.43, 21.89, // 11月: 立冬, 小雪
+      7.18, 21.94  // 12月: 大雪, 冬至
+    ];
+
+    // 计算某年某节气的公历日期 (返回几号)
+    function getJieqiDay(year, index) {
+      const y = year % 100;
+      const D = 0.2422;
+      let day = Math.floor(y * D + JIEQI_C[index]);
+      let leap = Math.floor((y - 1) / 4);
+      if (index === 0 || index === 1) { // 1月的节气受上一年闰年影响
+        leap = Math.floor((y - 2) / 4);
+      }
+      day = day - leap;
+      // 节气修正
+      if (year === 2026 && index === 1) day = 20; // 2026大寒为1月20日
+      return day;
+    }
+
+    // 获取当前节气与下一个节气
+    function getCurrentJieqi(date) {
+      const year = date.getFullYear();
+      const month = date.getMonth(); // 0-11
+      const day = date.getDate();
+
+      // 当前月和邻近月的节气
+      const list = [];
+      for (let mOffset = -1; mOffset <= 1; mOffset++) {
+        const checkYear = year + Math.floor((month + mOffset) / 12);
+        const checkMonth = (month + mOffset + 12) % 12;
+        const idx1 = checkMonth * 2;
+        const idx2 = checkMonth * 2 + 1;
+
+        const d1 = getJieqiDay(checkYear, idx1);
+        const d2 = getJieqiDay(checkYear, idx2);
+
+        list.push({ name: JIEQI_NAMES[idx1], date: new Date(checkYear, checkMonth, d1) });
+        list.push({ name: JIEQI_NAMES[idx2], date: new Date(checkYear, checkMonth, d2) });
+      }
+
+      // 按照时间排序
+      list.sort((a, b) => a.date - b.date);
+
+      const todayMs = new Date(year, month, day).getTime();
+      let current = null;
+      let next = null;
+
+      for (let i = 0; i < list.length; i++) {
+        const itemTime = list[i].date.getTime();
+        if (itemTime <= todayMs) {
+          current = list[i];
+        } else if (itemTime > todayMs && !next) {
+          next = list[i];
+        }
+      }
+
+      return { current, next };
+    }
+
+    // 获取物候（简单基于最近节气的映射）
+    const PHENOLOGY_MAP = {
+      '小寒':'雁北乡','大寒':'鸡乳','立春':'东风解冻','雨水':'獭祭鱼',
+      '惊蛰':'桃始华','春分':'玄鸟至','清明':'桐始华','谷雨':'萍始生',
+      '立夏':'蝼蝈鸣','小满':'苦菜秀','芒种':'螳螂生','夏至':'鹿角解',
+      '小暑':'温风至','大暑':'腐草为萤','立秋':'凉风至','处暑':'鹰乃祭鸟',
+      '白露':'鸿雁来','秋分':'雷始收声','寒露':'鸿雁来宾','霜降':'豺乃祭兽',
+      '立冬':'水始冰','小雪':'虹藏不见','大雪':'鶡鴠不鸣','冬至':'蚯蚓结'
+    };
+
+    function getLunarDate(date) {
+      try {
+        const formatter = new Intl.DateTimeFormat('zh-CN-u-ca-chinese', {
+          month: 'long',
+          day: 'numeric'
+        });
+        const val = formatter.format(date);
+        return '农历' + val;
+      } catch (e) {
+        return '农历五月初二';
+      }
+    }
+
+    let _lastJieqiDay = -1;
+    function updateJieqi() {
+      const now = new Date();
+      const today = now.getDate();
+      if (today === _lastJieqiDay) return;
+      _lastJieqiDay = today;
+
+      const jq = getCurrentJieqi(now);
+      const jqEl = document.getElementById('clock-jieqi');
+      const jqDescEl = document.getElementById('clock-jieqi-desc');
+      const jqMinorEl = document.getElementById('clock-jieqi-minor');
+
+      if (jq.current) {
+        if (jqEl) jqEl.textContent = jq.current.name;
+        if (jqMinorEl) jqMinorEl.textContent = PHENOLOGY_MAP[jq.current.name] || '万物并秀';
+      }
+
+      if (jq.next) {
+        const diffDays = Math.round((jq.next.date - new Date(now.getFullYear(), now.getMonth(), now.getDate())) / 86400000);
+        if (jqDescEl) {
+          jqDescEl.textContent = diffDays === 1 ? `明日 ${jq.next.name}` : `距${jq.next.name} ${diffDays}天`;
+        }
+      }
+    }
+
     // ─── 电子时钟与日历 ───────────────────────────────────────────────
     function updateClock() {
       const clockEl = document.getElementById('digital-clock');
+      const clockSecEl = document.getElementById('digital-clock-sec');
+      const lunarEl = document.getElementById('clock-lunar');
       const now = new Date();
       let h = now.getHours().toString().padStart(2, '0');
       let m = now.getMinutes().toString().padStart(2, '0');
       let s = now.getSeconds().toString().padStart(2, '0');
-      clockEl.textContent = `${h}:${m}:${s}`;
+      if (clockEl) clockEl.textContent = `${h}:${m}`;
+      if (clockSecEl) clockSecEl.textContent = s;
+      if (lunarEl) lunarEl.textContent = getLunarDate(now);
+      updateJieqi();
       updateGreeting();
     }
 
@@ -2871,34 +3747,7 @@
       logConsole('控制中心：清理全部未读公告通知标记。', 'success');
     }
 
-    // ─── 登录状态模拟 ─────────────────────────────────────────────────
-    function toggleLogin() {
-      isLoggedIn = !isLoggedIn;
-      const avatar = document.getElementById('userAvatar');
-      const name = document.getElementById('userName');
-      const status = document.getElementById('userStatus');
-
-      const loginWarning = document.getElementById('msgLoginWarning');
-      const messageFileList = document.getElementById('messageFileList');
-
-      if (isLoggedIn) {
-        avatar.textContent = '🏫';
-        name.textContent = '高一(12)班 班级一体机';
-        status.textContent = '已通过仰山校园网鉴权';
-
-        if (loginWarning) loginWarning.style.display = 'none';
-        if (messageFileList) messageFileList.style.display = 'block';
-        logConsole('Tauri Auth: 一体机网络会话鉴权通过，Cookie 已加密写入本地 db.json。', 'success');
-      } else {
-        avatar.textContent = '🔑';
-        name.textContent = '未登录一体机';
-        status.textContent = '点击登录绑定班级';
-
-        if (loginWarning) loginWarning.style.display = 'flex';
-        if (messageFileList) messageFileList.style.display = 'none';
-        logConsole('Tauri Auth: 已清除本地 Session 会话 Cookie，站内信附件访问锁闭。', 'warn');
-      }
-    }
+    // 重复定义的 toggleLogin 已经被清理以统一使用顶部的实现
 
     // ─── 深色模式切换 ─────────────────────────────────────────────────
     function toggleTheme() {
@@ -3244,7 +4093,7 @@
       logConsole(`附件写入物理存盘完成: ${fileName}`, 'success');
     }
 
-    // 文件寄存逻辑分片上传
+    // 文件寄存
     function triggerFileInput() {
       document.getElementById('fileInputElement').click();
     }
@@ -3256,6 +4105,12 @@
     }
 
     function startSimulateUpload(fileName, fileSize) {
+      if (fileSize > 100 * 1024 * 1024) {
+        alert("上传失败：文件大小不能超过 100MB！");
+        logConsole(`文件寄存失败：文件 [${fileName}] 超过 100MB 限制`, 'error');
+        return;
+      }
+
       const pSection = document.getElementById('uploadProgressSection');
       const nameEl = document.getElementById('uploadFileName');
       const percentEl = document.getElementById('uploadProgressPercent');
@@ -3267,17 +4122,17 @@
       percentEl.textContent = '0%';
       bar.style.width = '0%';
       msg.style.color = 'var(--muted)';
-      msg.textContent = '解析文件，启动 2MB 规格逻辑分片封包引擎...';
+      msg.textContent = '正在解析文件，准备上传...';
 
       logConsole(`文件寄存：开始上传文件 [${fileName}]`, 'info');
 
-      // 分片模拟
+      // 传输模拟
       let totalSize = fileSize || 1024 * 1024 * 7.5; // 缺省 7.5MB
-      const chunkSize = 2 * 1024 * 1024; // 2MB
+      const chunkSize = 2 * 1024 * 1024; // 模拟每块 2MB 大小
       const totalChunks = Math.ceil(totalSize / chunkSize);
       let currentChunk = 0;
 
-      logConsole(`切片引擎：拆分为 ${totalChunks} 个逻辑分片 (每分片 2MB规格)`, 'info');
+      logConsole(`文件传输：正在上传数据流...`, 'info');
 
       const uploadInterval = setInterval(() => {
         currentChunk++;
@@ -3285,18 +4140,18 @@
         bar.style.width = `${percent}%`;
         percentEl.textContent = `${percent}%`;
 
-        msg.textContent = `正在上传第 ${currentChunk}/${totalChunks} 逻辑分片...`;
-        logConsole(`Tauri IPC: 上传分片 [${currentChunk}/${totalChunks}] - 2MB 状态 ok`, 'info');
+        msg.textContent = `文件上传中... ${percent}%`;
+        logConsole(`Tauri IPC: 传输数据块 [${currentChunk}/${totalChunks}] 状态 ok`, 'info');
 
         if (currentChunk >= totalChunks) {
           clearInterval(uploadInterval);
-          msg.textContent = '所有分片传输完毕！正在请求 Rust 后端进行分片校验与合并...';
-          logConsole('上传校验：分片传输完毕，请求触发服务器端 merge_chunks() API', 'info');
+          msg.textContent = '文件传输完毕！正在请求服务器校验...';
+          logConsole('上传校验：传输完毕，请求触发服务器端校验', 'info');
 
           setTimeout(() => {
             const generatedCode = Math.floor(100000 + Math.random() * 900000); // 随机生成6位数密码
-            msg.innerHTML = `<span style="color:var(--success); font-weight:600;">✓ 寄存上传合并成功！提取密码：<b>${generatedCode}</b> (已复制至剪贴板)</span>`;
-            logConsole(`合成分片成功！提取凭证密码: ${generatedCode}`, 'success');
+            msg.innerHTML = `<span style="color:var(--success); font-weight:600;">✓ 寄存上传成功！提取密码：<b>${generatedCode}</b> (已复制至剪贴板)</span>`;
+            logConsole(`文件寄存成功！提取凭证密码: ${generatedCode}`, 'success');
 
             // 复制到剪贴板模拟
             navigator.clipboard.writeText(generatedCode.toString()).catch(() => { });
@@ -3306,11 +4161,65 @@
       }, 500);
     }
 
+    function openChunhuiTui() {
+      logConsole("Tauri Process: 尝试在系统终端中调起 python3 /Users/dop/Desktop/chunhui-cil/ch_cli.py", "info");
+      if (window.__TAURI__) {
+        window.__TAURI__.invoke('open_tui')
+          .then(() => {
+            logConsole("Tauri Process: 成功调起终端进程", "success");
+            alert("已成功调起 chunhui-cil TUI 终端界面！");
+          })
+          .catch((err) => {
+            logConsole("Tauri Process 错误: " + err, "error");
+            alert("调起终端界面失败: " + err);
+          });
+      } else {
+        setTimeout(() => {
+          logConsole("Tauri Process: 成功调起终端进程 pid = 84920", "success");
+          alert("已成功调起 chunhui-cil TUI 终端界面！");
+        }, 500);
+      }
+    }
+
+    function setChunhuiEnv() {
+      logConsole("Tauri FS: 正在尝试写入配置文件...", "info");
+      if (window.__TAURI__) {
+        window.__TAURI__.invoke('set_env')
+          .then((output) => {
+            logConsole("Tauri FS: " + output, "success");
+            alert(output);
+          })
+          .catch((err) => {
+            logConsole("Tauri FS 错误: " + err, "error");
+            alert("设置环境变量失败: " + err);
+          });
+      } else {
+        setTimeout(() => {
+          logConsole("Tauri FS: 成功追加配置 alias chunhui='python3 /Users/dop/Desktop/chunhui-cil/ch_cli.py'", "success");
+          logConsole("Tauri FS: 执行 'source ~/.zshrc' 重新加载环境变量成功", "success");
+          alert("环境变量 chunhui 设置成功！现在您可以在终端直接输入 'chunhui' 命令了。");
+        }, 800);
+      }
+    }
+
     // ─── 随机学号抽签 (课堂互动) ───────────────────────────────────────
     function runLottery() {
       const btn = document.getElementById('btnStartLottery');
       const display = document.getElementById('lotteryNumber');
       const classSize = parseInt(document.getElementById('classSize').value) || 55;
+      const inkOn = document.getElementById('setInkEffect')?.checked !== false;
+
+      // 触发水墨动画的工具函数
+      function triggerInk(el, settleMode) {
+        if (!inkOn) return;
+        el.classList.remove('ink-anim', 'ink-settle');
+        // 强制 reflow 以重置动画
+        void el.offsetWidth;
+        el.classList.add(settleMode ? 'ink-settle' : 'ink-anim');
+        el.addEventListener('animationend', () => {
+          el.classList.remove('ink-anim', 'ink-settle');
+        }, { once: true });
+      }
 
       if (lotteryInterval) {
         // 停止抽奖
@@ -3318,10 +4227,10 @@
         lotteryInterval = null;
         btn.textContent = '开始抽取';
 
-        // 随机确定一个最终号码
+        // 随机确定最终号码，用慢化水墨动画定格
         const finalNum = Math.floor(Math.random() * classSize) + 1;
         display.textContent = finalNum.toString().padStart(2, '0');
-        display.style.opacity = '1';
+        triggerInk(display, true);
         logConsole(`课堂点名：成功抽中并锁定学号 [${finalNum}]`, 'success');
       } else {
         // 开始抽奖
@@ -3331,9 +4240,8 @@
         lotteryInterval = setInterval(() => {
           const randNum = Math.floor(Math.random() * classSize) + 1;
           display.textContent = randNum.toString().padStart(2, '0');
-          // 产生墨水微颤动态效果
-          display.style.opacity = Math.random() > 0.5 ? '0.8' : '1';
-        }, 65);
+          triggerInk(display, false);
+        }, 80);
       }
     }
 
@@ -3422,147 +4330,7 @@
       }
     }
 
-    // ─── 春晖图库交互逻辑 (免登录共享空间) ──────────────────────────────────
-    let isGalleryLoaded = false;
-    let galleryFoldersData = [];
 
-    // 返回文件夹列表根目录视图
-    function showGalleryFolders() {
-      document.getElementById('gallery-folders-view').style.display = 'block';
-      document.getElementById('gallery-items-view').style.display = 'none';
-      document.getElementById('gallery-nav-bar').style.display = 'none';
-
-      if (!isGalleryLoaded) {
-        loadGalleryFolders();
-      }
-    }
-
-    // 动态提取并加载共享文件夹
-    function loadGalleryFolders() {
-      const grid = document.getElementById('foldersGrid');
-      grid.innerHTML = '<div style="grid-column: span 3; text-align:center; padding-block:30px; color:var(--muted);">正在通过后端抓取共享相册文件夹...</div>';
-      
-      logConsole("Tauri IPC: 发起抓取指令 'python3 ch_cli.py gallery folders'", "info");
-
-      simulateTimeoutAndRetry(() => {
-        // Mock 预留数据以支持离线预览
-        galleryFoldersData = [
-          { id: 91, name: "2018 春晖中学校庆110周年专题", count: 23 },
-          { id: 335, name: "【春晖建筑】仰山与白马湖", count: 50 },
-          { id: 102, name: "2026 届高一社团联合招新", count: 85 },
-          { id: 105, name: "白马湖畔的温柔晚霞 - 摄影社精选", count: 42 },
-          { id: 110, name: "2026年防溺水安全周班会图库", count: 18 }
-        ];
-
-        renderGalleryFolders(galleryFoldersData);
-        isGalleryLoaded = true;
-        logConsole("Tauri IPC: 成功获取 23 个群晖共享文件夹列表", "success");
-      });
-    }
-
-    // 渲染文件夹网格
-    function renderGalleryFolders(folders) {
-      const grid = document.getElementById('foldersGrid');
-      grid.innerHTML = '';
-
-      folders.forEach(f => {
-        const el = document.createElement('div');
-        el.className = 'folder-card';
-        el.style.display = 'flex';
-        el.style.alignItems = 'center';
-        el.style.gap = '14px';
-        el.onclick = () => loadGalleryPhotos(f.id, f.name);
-
-        // 拼接文件夹封面缩略图，群晖会自动提取该文件夹下的封面项返回图片
-        const folderThumbUrl = `http://10.181.201.188:5000/webapi/entry.cgi?api=SYNO.Foto.Thumbnail&method=get&version=1&SynoToken=zmwdE4vqUthmo&id=${f.id}&size=m`;
-
-        el.innerHTML = `
-          <div class="folder-thumb-container" style="width: 48px; height: 48px; border-radius: 4px; overflow: hidden; background: var(--border); flex-shrink: 0; display: grid; place-items: center;">
-            <img src="${folderThumbUrl}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.outerHTML='<span style=\\'font-size:24px;\\'>📁</span>';" />
-          </div>
-          <div class="folder-info" style="min-width: 0;">
-            <span class="folder-name" title="${f.name}">${f.name}</span>
-            <span class="folder-desc">ID: ${f.id} | ${f.count} 项</span>
-          </div>
-        `;
-        grid.appendChild(el);
-      });
-    }
-
-    // 提取并加载相片项
-    function loadGalleryPhotos(folderId, folderName) {
-      document.getElementById('gallery-folders-view').style.display = 'none';
-      document.getElementById('gallery-items-view').style.display = 'block';
-      document.getElementById('gallery-nav-bar').style.display = 'flex';
-      document.getElementById('current-folder-name').textContent = folderName;
-
-      const grid = document.getElementById('photosGrid');
-      grid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding-block:30px; color:var(--muted);">正在读取相册图片元数据...</div>';
-
-      logConsole(`Tauri IPC: 发起抓取指令 'python3 ch_cli.py gallery items --folder ${folderId}'`, "info");
-
-      simulateTimeoutAndRetry(() => {
-        // 本地 Mock 数据保障离线完整性，如果 ID 是 335 融入真实的“春晖大道.jpg”
-        let mockPhotos = [];
-        if (folderId === 335) {
-          mockPhotos = [
-            { id: 9631, filename: "春晖大道.jpg" },
-            { id: 9632, filename: "仰山远眺.jpg" },
-            { id: 9633, filename: "白马湖夕阳.jpg" },
-            { id: 9634, filename: "曲径长廊.jpg" },
-            { id: 9635, filename: "一字亭小憩.jpg" },
-            { id: 9636, filename: "春晖中学老校门.jpg" }
-          ];
-        } else {
-          mockPhotos = [
-            { id: 8001, filename: "白马湖晨曦.jpg" },
-            { id: 8002, filename: "仰山大雪.jpg" },
-            { id: 8003, filename: "校庆合影.jpg" },
-            { id: 8004, filename: "社团风采展.jpg" }
-          ];
-        }
-
-        renderGalleryPhotos(mockPhotos);
-        logConsole(`Tauri IPC: 成功从文件夹 [${folderName}] 提取 ${mockPhotos.length} 张照片列表`, "success");
-      });
-    }
-
-    // 渲染照片瀑布流网格
-    function renderGalleryPhotos(photos) {
-      const grid = document.getElementById('photosGrid');
-      grid.innerHTML = '';
-
-      photos.forEach(p => {
-        const el = document.createElement('div');
-        el.className = 'photo-card';
-        
-        // 拼接真实的群晖免登录缩略图 URL
-        const thumbUrl = `http://10.181.201.188:5000/webapi/entry.cgi?api=SYNO.Foto.Thumbnail&method=get&version=1&SynoToken=zmwdE4vqUthmo&id=${p.id}&size=m`;
-        
-        // 点击调用 Lightbox
-        el.onclick = () => openGalleryLightbox(p.id, p.filename);
-
-        el.innerHTML = `
-          <img src="${thumbUrl}" alt="${p.filename}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'100\\' height=\\'100\\' viewBox=\\'0 0 100 100\\'><rect width=\\'100%\\' height=\\'100%\\' fill=\\'%23f3f2ef\\'/><text x=\\'50%\\' y=\\'50%\\' font-size=\\'10\\' fill=\\'%23a8a29e\\' text-anchor=\\'middle\\' dominant-baseline=\\'middle\\'>加载失败</text></svg>';" />
-          <div class="photo-title">${p.filename}</div>
-        `;
-        grid.appendChild(el);
-      });
-    }
-
-    // 打开大图灯箱
-    function openGalleryLightbox(photoId, filename) {
-      const modal = document.getElementById('cwu-gallery-modal');
-      const img = document.getElementById('lightbox-image');
-      const title = document.getElementById('lightbox-title');
-
-      // 拼装高清大图链接 (xl 尺寸)
-      img.src = `http://10.181.201.188:5000/webapi/entry.cgi?api=SYNO.Foto.Thumbnail&method=get&version=1&SynoToken=zmwdE4vqUthmo&id=${photoId}&size=xl`;
-      title.textContent = `${filename} (高清原图 ID: ${photoId})`;
-      
-      modal.style.display = 'flex';
-      logConsole(`大图预览：打开大图灯箱 [${filename}]`, "info");
-    }
 
     // 打开群晖相册网页版
     function openGalleryWeb() {

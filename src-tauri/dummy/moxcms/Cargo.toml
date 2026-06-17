@@ -1,0 +1,4 @@
+[package]
+name = "moxcms"
+version = "0.8.1"
+edition = "2021"
